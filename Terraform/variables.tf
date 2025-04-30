@@ -31,7 +31,7 @@ variable "availability_zones" {
 variable "ami_id" {
   description = "AMI ID para la instancia EC2"
   type        = string
-  default     = "ami-0c55b159cbfafe1f0" # Ubuntu 20.04 LTS
+  default     = "ami-0e449927258d45bc4"
 }
 
 variable "instance_type" {
@@ -43,7 +43,7 @@ variable "instance_type" {
 variable "key_name" {
   description = "Nombre del par de claves EC2"
   type        = string
-  default     = "pair_kay"
+  default     = "pair_key_moviesphere"
 }
 
 variable "aws_region" {
