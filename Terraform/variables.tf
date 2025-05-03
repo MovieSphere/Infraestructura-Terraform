@@ -46,8 +46,20 @@ variable "key_name" {
   default     = "pair_key_moviesphere"
 }
 
-variable "aws_region" {
-  description = "Región de AWS"
+variable "region" {
+  description = "Región de AWS donde se creará la infraestructura"
   type        = string
   default     = "us-east-1"
+}
+
+
+variable "bucket_name" {
+  description = "Nombre del bucket S3 para el frontend"
+  type        = string
+}
+
+variable "cf_price_class" {
+  description = "Clase de precio CloudFront"
+  type        = string
+  default     = "PriceClass_100"
 }
