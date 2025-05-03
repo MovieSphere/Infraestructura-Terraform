@@ -1,18 +1,31 @@
-resource "aws_s3_bucket" "frontend" {
-  bucket = var.bucket_name
+resource "random_id" "bucket_suffix" {
+  byte_length = 4
+}
 
-  # Habilita hosting estático: index.html y error.html
-  website {
-    index_document = "index.html"
-    error_document = "error.html"
+resource "aws_s3_bucket" "frontend" {
+  bucket = "${lower(var.project_name)}-${var.environment}-${coalesce(var.bucket_suffix, random_id.bucket_suffix.hex)}"
+  tags = {
+    Name        = "${var.project_name}-frontend"
+    Environment = var.environment
   }
 
-  tags = {
-    Name = "moviesphere-frontend"
+  lifecycle {
+    ignore_changes = [bucket]  # Evita cambios después de la creación
   }
 }
 
-# Opcional: bloqueo de acceso público (recomendado)
+resource "aws_s3_bucket_website_configuration" "frontend" {
+  bucket = aws_s3_bucket.frontend.id
+
+  index_document {
+    suffix = "index.html"
+  }
+
+  error_document {
+    key = "error.html"
+  }
+}
+
 resource "aws_s3_bucket_public_access_block" "frontend" {
   bucket                  = aws_s3_bucket.frontend.id
   block_public_acls       = true
