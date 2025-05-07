@@ -1,0 +1,14 @@
+Set-Location website
+@"
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>MovieSphere Frontend</title>
+</head>
+<body>
+  <h1>¡Hola MovieSphere!</h1>
+  <p>Esto es un sitio estático servido desde S3 + CloudFront.</p>
+</body>
+</html>
+"@ | Out-File -FilePath index.html -Encoding utf8

@@ -1,6 +1,7 @@
 provider "aws" {
-  region = var.aws_region
+  region = var.region
 }
+
 
 # EC2 Instance
 resource "aws_instance" "app_server" {
