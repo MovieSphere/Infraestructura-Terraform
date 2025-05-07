@@ -34,10 +34,10 @@ resource "aws_cloudwatch_metric_alarm" "ec2_memory" {
   }
 }
 
-# CloudWatch Log Group para Lambda (gratuito hasta 5GB)
+# CloudWatch Log Group para Lambda
 resource "aws_cloudwatch_log_group" "lambda_logs" {
   name              = "/aws/lambda/${aws_lambda_function.app_lambda.function_name}"
-  retention_in_days = 7  # Reducido a 7 días para minimizar costos
+  retention_in_days = 7 
 }
 
 # CloudWatch Alarm para errores de Lambda
@@ -76,7 +76,7 @@ resource "aws_cloudwatch_metric_alarm" "s3_errors" {
   }
 }
 
-# CloudWatch Dashboard básico (gratuito)
+# CloudWatch Dashboard básico
 resource "aws_cloudwatch_dashboard" "main" {
   dashboard_name = "${var.project_name}-dashboard"
 
