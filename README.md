@@ -6,7 +6,7 @@ Los usuarios de plataformas de streaming suelen tener dificultades para encontra
 Moviesphere es una plataforma web de recomendación de películas personalizada, similar a IMDb, que utiliza una arquitectura moderna basada en microservicios desplegados en contenedores Docker. La aplicación está desarrollada en Spring boot para el backend y TypeScript para el frontend (Angular), y utiliza PostgreSQL como base de datos principal para sus usuarios, entre otras. La infraestructura está definida con Terraform, permitiendo separar entornos de desarrollo, pruebas (staging) y producción. Este enfoque busca escalabilidad, facilidad de mantenimiento y automatización de despliegues con herramientas como Jenkins, Ansible y Terraform.
 
 
-## 🏗️ Arquitectura
+##  Arquitectura
 
 La infraestructura incluye:
 
@@ -17,13 +17,13 @@ La infraestructura incluye:
 - **CloudFront** para CDN
 - **CloudWatch** para monitoreo básico
 
-## 📋 Prerrequisitos
+## Prerrequisitos
 
 - AWS CLI configurado
 - Terraform instalado
 - Credenciales de AWS configuradas
 
-## 🚀 Instalación
+## Instalación
 
 1. Clonar el repositorio:
 ```bash
@@ -47,7 +47,7 @@ terraform plan
 terraform apply
 ```
 
-## 🏢 Componentes
+## Componentes
 
 ### VPC y Redes
 - VPC con CIDR personalizable
@@ -74,7 +74,7 @@ terraform apply
 - Logs de Lambda (7 días retención)
 - Dashboard simple
 
-## 💰 Costos
+## Costos
 
 La infraestructura está diseñada para minimizar costos:
 - Uso de servicios dentro del tier gratuito de AWS
@@ -82,21 +82,21 @@ La infraestructura está diseñada para minimizar costos:
 - Retención de logs reducida
 - Sin VPC Endpoints costosos
 
-## 🔒 Seguridad
+## Seguridad
 
 - Security Groups con acceso mínimo
 - IAM Roles con permisos específicos
 - S3 con acceso público bloqueado
 - CloudFront con HTTPS
 
-## 📊 Monitoreo
+## Monitoreo
 
 CloudWatch Dashboard incluye:
 - Métricas de CPU de EC2
 - Invocaciones de Lambda
 - Logs de Lambda
 
-## 🧹 Limpieza
+## Limpieza
 
 Para destruir la infraestructura:
 ```bash
