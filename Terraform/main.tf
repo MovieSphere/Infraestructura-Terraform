@@ -2,8 +2,7 @@ provider "aws" {
   region = var.region
 }
 
-
-# EC2 Instance
+# EC2 Instance en subred pública
 resource "aws_instance" "app_server" {
   ami                    = var.ami_id
   instance_type          = var.instance_type
@@ -88,4 +87,63 @@ resource "aws_security_group" "app_sg" {
 resource "aws_iam_role_policy_attachment" "lambda_basic" {
   role       = aws_iam_role.lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+# Política para CloudWatch Logs
+resource "aws_iam_role_policy" "lambda_cloudwatch" {
+  name = "${var.project_name}-lambda-cloudwatch-policy"
+  role = aws_iam_role.lambda_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = [
+          "arn:aws:logs:${var.region}:*:log-group:/aws/lambda/${aws_lambda_function.app_lambda.function_name}:*"
+        ]
+      }
+    ]
+  })
+}
+
+# IAM policy para acceso a S3 y SQS
+resource "aws_iam_role_policy" "lambda_s3_sqs" {
+  name = "${var.project_name}-lambda-s3-sqs-policy"
+  role = aws_iam_role.lambda_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::${var.project_name}-*",
+          "arn:aws:s3:::${var.project_name}-*/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "sqs:SendMessage",
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
+        ]
+        Resource = [
+          "arn:aws:sqs:${var.region}:*:${var.project_name}-*"
+        ]
+      }
+    ]
+  })
 }
