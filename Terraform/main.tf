@@ -2,20 +2,6 @@ provider "aws" {
   region = var.region
 }
 
-
-# EC2 Instance
-resource "aws_instance" "app_server" {
-  ami                    = var.ami_id
-  instance_type          = var.instance_type
-  subnet_id              = aws_subnet.public[0].id
-  vpc_security_group_ids = [aws_security_group.app_sg.id]
-  key_name               = var.key_name
-
-  tags = {
-    Name = "${var.project_name}-app-server"
-  }
-}
-
 # Lambda Function
 data "archive_file" "lambda_zip" {
   type        = "zip"

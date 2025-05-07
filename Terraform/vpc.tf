@@ -18,7 +18,7 @@ resource "aws_internet_gateway" "gw" {
   }
 }
 
-# Subredes públicas
+# Subred pública
 resource "aws_subnet" "public" {
   count                   = length(var.public_subnet_cidrs)
   vpc_id                  = aws_vpc.main.id
@@ -31,7 +31,7 @@ resource "aws_subnet" "public" {
   }
 }
 
-# Subredes privadas
+# Subred privada
 resource "aws_subnet" "private" {
   count             = length(var.private_subnet_cidrs)
   vpc_id            = aws_vpc.main.id
@@ -43,7 +43,7 @@ resource "aws_subnet" "private" {
   }
 }
 
-# Tabla de rutas pública
+# Tabla de ruta pública
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
@@ -57,7 +57,7 @@ resource "aws_route_table" "public" {
   }
 }
 
-# Asociación de tabla de rutas con cada subred pública
+# Asociación de tabla de ruta con cada subred pública
 resource "aws_route_table_association" "public" {
   count          = length(var.public_subnet_cidrs)
   subnet_id      = aws_subnet.public[count.index].id
