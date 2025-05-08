@@ -53,9 +53,7 @@ resource "aws_instance" "ec2_ubuntu_docker" {
           - "3001:8091"
         environment:
           - SPRING_PROFILES_ACTIVE=prod
-          - SPRING_DATASOURCE_URL=${AUTH_DB_URL}
-          - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
-          - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+          - SPRING_DATASOURCE_URL=$${AUTH_DB_URL}
         restart: unless-stopped
         env_file: /home/ubuntu/.env
 
@@ -69,9 +67,7 @@ resource "aws_instance" "ec2_ubuntu_docker" {
           - "3002:8092"
         environment:
           - SPRING_PROFILES_ACTIVE=prod
-          - SPRING_DATASOURCE_URL=${USERS_DB_URL}
-          - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
-          - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+          - SPRING_DATASOURCE_URL=$${USERS_DB_URL}
         restart: unless-stopped
         env_file: /home/ubuntu/.env
     EOT
