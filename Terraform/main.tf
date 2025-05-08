@@ -75,3 +75,9 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
   role       = aws_iam_role.lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
+
+locals {
+  db_subnet_ids          = aws_subnet.private[*].id
+  vpc_security_group_ids = [aws_security_group.docker_sg.id]
+}
+

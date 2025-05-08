@@ -85,11 +85,3 @@ variable "db_password" {
   type      = string
   sensitive = true
 }
-
-variable "db_subnet_ids" {
-  type = list(string)
-}
-
-variable "vpc_security_group_ids" {
-  type = list(string)
-}
