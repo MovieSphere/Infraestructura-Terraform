@@ -29,6 +29,17 @@ resource "aws_instance" "ec2_ubuntu_docker" {
     git clone https://github.com/MovieSphere/ms_user_service.git
     git clone https://github.com/MovieSphere/ms_auth_service.git
 
+    # Crear archivo .env
+    cat <<EOT > /home/ubuntu/.env
+    DB_USERNAME=${var.db_username}
+    DB_PASSWORD=${var.db_password}
+    AUTH_DB_URL=jdbc:postgresql://${aws_db_instance.auth_db.address}:5432/auth_db
+    USERS_DB_URL=jdbc:postgresql://${aws_db_instance.users_db.address}:5432/users_db
+    EOT
+
+    chown ubuntu:ubuntu /home/ubuntu/.env
+
+    # Crear docker-compose.yml
     cat <<EOT > /home/ubuntu/docker-compose.yml
     version: "3.9"
     services:
@@ -42,10 +53,11 @@ resource "aws_instance" "ec2_ubuntu_docker" {
           - "3001:8091"
         environment:
           - SPRING_PROFILES_ACTIVE=prod
-          - SPRING_DATASOURCE_URL=jdbc:postgresql://${aws_db_instance.auth_db.address}:5432/auth_db
-          - SPRING_DATASOURCE_USERNAME=${var.db_username}
-          - SPRING_DATASOURCE_PASSWORD=${var.db_password}
+          - SPRING_DATASOURCE_URL=${AUTH_DB_URL}
+          - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+          - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
         restart: unless-stopped
+        env_file: /home/ubuntu/.env
 
       ms_user:
         build:
@@ -57,15 +69,16 @@ resource "aws_instance" "ec2_ubuntu_docker" {
           - "3002:8092"
         environment:
           - SPRING_PROFILES_ACTIVE=prod
-          - SPRING_DATASOURCE_URL=jdbc:postgresql://${aws_db_instance.users_db.address}:5432/users_db
-          - SPRING_DATASOURCE_USERNAME=${var.db_username}
-          - SPRING_DATASOURCE_PASSWORD=${var.db_password}
+          - SPRING_DATASOURCE_URL=${USERS_DB_URL}
+          - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+          - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
         restart: unless-stopped
+        env_file: /home/ubuntu/.env
     EOT
 
     chown ubuntu:ubuntu /home/ubuntu/docker-compose.yml
 
-    su - ubuntu -c "docker compose -f /home/ubuntu/docker-compose.yml up -d"
+    su - ubuntu -c "docker compose --env-file /home/ubuntu/.env -f /home/ubuntu/docker-compose.yml up -d"
   EOF
 
   tags = {
