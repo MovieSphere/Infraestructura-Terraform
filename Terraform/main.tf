@@ -147,3 +147,9 @@ resource "aws_iam_role_policy" "lambda_s3_sqs" {
     ]
   })
 }
+
+locals {
+  db_subnet_ids          = aws_subnet.private[*].id
+  vpc_security_group_ids = [aws_security_group.docker_sg.id]
+}
+
