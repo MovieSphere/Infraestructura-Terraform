@@ -28,10 +28,10 @@ output "internet_gateway_id" {
   value       = aws_internet_gateway.gw.id
 }
 
-# Endpoint del sitio web estático (VERSIÓN CORREGIDA)
+# Endpoint del sitio web estático
 output "s3_website_endpoint" {
   description = "URL del sitio web estático S3"
-  value       = aws_s3_bucket_website_configuration.frontend.website_endpoint  # Nueva referencia
+  value       = aws_s3_bucket_website_configuration.frontend.website_endpoint  
 }
 
 # Este recurso define la salida del dominio de la distribución de CloudFront.
