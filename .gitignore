@@ -36,5 +36,7 @@ override.tf.json
 .terraformrc
 terraform.rc
 
+settings.json
+
 # Ignore the lambda function
 lambda_function.zip
