@@ -16,3 +16,8 @@ sudo apt-get update
 # Install the Docker packages:
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
+# Clonar repositorios
+cd /home/ubuntu || exit
+git clone https://github.com/MovieSphere/ms_user_service.git
+git clone https://github.com/MovieSphere/ms_auth_service.git
+
