@@ -60,3 +60,12 @@ resource "aws_route_table_association" "public_assoc" {
   subnet_id      = aws_subnet.public.id
   route_table_id = aws_route_table.public.id
 }
+
+# Grupo de subredes para RDS
+resource "aws_db_subnet_group" "rds_subnet_group" {
+  name       = "${var.project_name}-rds-subnet-group"
+  subnet_ids = [aws_subnet.private.id]
+  tags = {
+    Name = "${var.project_name}-rds-subnet-group"
+  }
+}
