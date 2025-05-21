@@ -1,5 +1,7 @@
 # Local .terraform directories
 **/.terraform/*
+.idea
+.vscode
 
 # .tfstate files
 *.tfstate
@@ -35,3 +37,8 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+settings.json
+
+# Ignore the lambda function
+lambda_function.zip
