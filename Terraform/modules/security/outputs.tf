@@ -15,3 +15,9 @@ output "ssh_sg_id" {
   description = "ID del Grupo de Seguridad de SSH"
   value = aws_security_group.ssh_sg.id
 }
+
+# Muestra el ID del Grupo de Seguridad del frontend
+output "frontend_sg_id" {
+  description = "ID del Grupo de Seguridad del frontend"
+  value       = aws_security_group.frontend_sg.id
+}
