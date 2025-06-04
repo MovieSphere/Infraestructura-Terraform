@@ -19,7 +19,7 @@ module "cloudwatch" {
   project_name     = var.project_name
   region           = var.region
   ec2_instance_id  = module.ec2.instance_id
-  alarm_actions    = [] # Aqui se puede configurar el envio de SNS
+  alarm_actions    = [module.monitoring.alerts_topic_arn] # Aqui se puede configurar el envio de SNS
 }
 
 module "api_gateway" {
@@ -67,4 +67,13 @@ module "alb" {
   vpc_id            = module.vpc.vpc_id
   public_subnet_ids = module.vpc.public_subnet_ids
   instance_ids = [module.ec2.instance_id]
+}
+
+module "logs" {
+  source          = "../../modules/logs"
+  project_name    = var.project_name
+  region          = var.region
+  log_group_name  = "MyApp-${var.project_name}-Logs"
+  alarm_email     = var.alarm_email
+  ec2_instance_id = module.ec2.instance_id
 }

@@ -71,3 +71,9 @@ variable "db_password" {
   type      = string
   sensitive = true
 }
+
+variable "alarm_email" {
+  type = string
+  description = "Correo al que se enviarán las alertas"
+  default = "jromerou2@upao.edu.pe"
+}
