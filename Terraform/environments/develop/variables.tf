@@ -7,7 +7,7 @@ variable "region" {
 variable "project_name" {
   description = "Nombre del proyecto"
   type        = string
-  default     = "MovieSphere"
+  default     = "moviesphere"
 }
 
 variable "vpc_cidr" {
@@ -16,33 +16,33 @@ variable "vpc_cidr" {
   default     = "10.0.0.0/16"
 }
 
-variable "public_subnet_cidr" {
-  description = "CIDRs de subred pública"
-  type        = string
-  default     = "10.0.1.0/24"
+variable "public_subnet_cidrs" {
+  description = "CIDRs de subredes públicas"
+  type        = list(string)
+  default     = ["10.0.1.0/24", "10.0.2.0/24"]
 }
 
-variable "private_subnet_cidr" {
-  description = "CIDRs de subred privada"
-  type        = string
-  default     = "10.0.3.0/24"
+variable "private_subnet_cidrs" {
+  description = "CIDRs de subredes privadas"
+  type        = list(string)
+  default     = ["10.0.3.0/24", "10.0.4.0/24"]
 }
 
 variable "user_ip_cidr" {
-  description = "IP personal para acceso SSH (formato: x.x.x.x/32)"
+  description = "IP personal para acceso SSH"
   type        = string
 }
 
-variable "availability_zone" {
+variable "availability_zones" {
   description = "Zonas de disponibilidad"
-  type        = string
-  default     = "us-east-1a"
+  type        = list(string)
+  default     = ["us-east-1a", "us-east-1b"]
 }
 
 variable "ami_id" {
   description = "AMI ID para EC2"
   type        = string
-  default     = "ami-0e449927258d45bc4"
+  default     = "ami-084568db4383264d4"
 }
 
 variable "instance_type" {

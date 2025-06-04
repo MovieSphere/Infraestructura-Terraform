@@ -6,17 +6,22 @@ resource "aws_instance" "ec2_ubuntu_docker" {
   vpc_security_group_ids      = [var.ec2_sg_id]
   key_name                    = var.key_name
 
-  user_data = templatefile("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
-    # DB de los ms (Aumentaran con el tiempo)
-    auth_db_host = var.auth_db_host
-    user_db_host = var.user_db_host
+  iam_instance_profile = var.iam_instance_profile
 
-    # Datos de la BD
-    db_username  = var.db_username
-    db_password  = var.db_password
+
+  user_data = templatefile("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
+    MS_AUTH_DB_URL = local.ms_auth_db_url
+    MS_USER_DB_URL = local.ms_user_db_url
+    DB_USERNAME    = var.db_username
+    DB_PASSWORD    = var.db_password
   })
 
   tags = {
     Name = "${var.project_name}-ec2-ubuntu-ms"
   }
+}
+
+locals {
+  ms_auth_db_url = "jdbc:postgresql://${var.auth_db_host}:5432/authdb"
+  ms_user_db_url = "jdbc:postgresql://${var.user_db_host}:5432/userdb"
 }

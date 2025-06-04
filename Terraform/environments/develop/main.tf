@@ -1,10 +1,10 @@
 module "vpc" {
-  source              = "../../modules/vpc"
-  project_name        = var.project_name
+  source               = "../../modules/vpc"
+  project_name         = var.project_name
   vpc_cidr            = var.vpc_cidr
-  public_subnet_cidr  = var.public_subnet_cidr
-  private_subnet_cidr = var.private_subnet_cidr
-  availability_zone   = var.availability_zone
+  public_subnet_cidrs  = var.public_subnet_cidrs
+  private_subnet_cidrs = var.private_subnet_cidrs
+  availability_zones   = var.availability_zones
 }
 
 module "security" {
@@ -12,6 +12,20 @@ module "security" {
   project_name   = var.project_name
   vpc_id         = module.vpc.vpc_id
   user_ip_cidr   = var.user_ip_cidr
+}
+
+module "cloudwatch" {
+  source           = "../../modules/cloudwatch"
+  project_name     = var.project_name
+  region           = var.region
+  ec2_instance_id  = module.ec2.instance_id
+  alarm_actions    = [] # Aqui se puede configurar el envio de SNS
+}
+
+module "api_gateway" {
+  source                = "../../modules/api_gateway"
+  project_name          = var.project_name
+  integration_uri       = module.alb.alb_dns_name
 }
 
 module "rds" {
@@ -24,12 +38,17 @@ module "rds" {
   db_subnet_group_name  = module.vpc.db_subnet_group_name
 }
 
+module "iam" {
+  source                = "../../modules/iam"
+  project_name          = var.project_name
+}
+
 module "ec2" {
   source          = "../../modules/ec2"
   project_name    = var.project_name
   ami_id          = var.ami_id
   instance_type   = var.instance_type
-  private_id      = module.vpc.private_subnet_id
+  private_id      = module.vpc.private_subnet_ids[0]
   ec2_sg_id       = module.security.ec2_sg_id
   key_name        = var.key_name
 
@@ -37,4 +56,15 @@ module "ec2" {
   user_db_host    = module.rds.users_db_address
   db_username     = var.db_username
   db_password     = var.db_password
+
+  iam_instance_profile = module.iam.aws_iam_instance_profile
+}
+
+module "alb" {
+  source            = "../../modules/elb"
+  project_name      = var.project_name
+  alb_sg_id         = module.security.alb_sg_id
+  vpc_id            = module.vpc.vpc_id
+  public_subnet_ids = module.vpc.public_subnet_ids
+  instance_ids = [module.ec2.instance_id]
 }

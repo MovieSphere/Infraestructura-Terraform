@@ -31,3 +31,7 @@ variable "db_username" {
 variable "db_password" {
   description = "Password para ingresar a la BD"
 }
+variable "iam_instance_profile" {
+  description = "Nombre del perfil de instancia IAM para CloudWatch"
+  type        = string
+}
