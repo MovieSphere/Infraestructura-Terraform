@@ -1,5 +1,5 @@
 module "vpc" {
-  source               = "../../modules/vpc"
+  source               = "../../../modules/vpc"
   project_name         = var.project_name
   vpc_cidr            = var.vpc_cidr
   public_subnet_cidrs  = var.public_subnet_cidrs
@@ -8,14 +8,14 @@ module "vpc" {
 }
 
 module "security" {
-  source         = "../../modules/security"
+  source         = "../../../modules/security"
   project_name   = var.project_name
   vpc_id         = module.vpc.vpc_id
   user_ip_cidr   = var.user_ip_cidr
 }
 
 module "cloudwatch" {
-  source           = "../../modules/cloudwatch"
+  source           = "../../../modules/cloudwatch"
   project_name     = var.project_name
   region           = var.region
   ec2_instance_id  = module.ec2.instance_id
@@ -23,13 +23,13 @@ module "cloudwatch" {
 }
 
 module "api_gateway" {
-  source                = "../../modules/api_gateway"
+  source                = "../../../modules/api_gateway"
   project_name          = var.project_name
   integration_uri       = module.alb.alb_dns_name
 }
 
 module "rds" {
-  source                = "../../modules/rds"
+  source                = "../../../modules/rds"
   project_name          = var.project_name
   db_username           = var.db_username
   db_password           = var.db_password
@@ -39,12 +39,12 @@ module "rds" {
 }
 
 module "iam" {
-  source                = "../../modules/iam"
+  source                = "../../../modules/iam"
   project_name          = var.project_name
 }
 
 module "ec2" {
-  source          = "../../modules/ec2"
+  source          = "../../../modules/ec2"
   project_name    = var.project_name
   ami_id          = var.ami_id
   instance_type   = var.instance_type
@@ -61,7 +61,7 @@ module "ec2" {
 }
 
 module "alb" {
-  source            = "../../modules/elb"
+  source            = "../../../modules/elb"
   project_name      = var.project_name
   alb_sg_id         = module.security.alb_sg_id
   vpc_id            = module.vpc.vpc_id
