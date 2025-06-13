@@ -69,7 +69,7 @@ resource "aws_security_group" "rds_sg" {
 # SSH Security Group (Ansible)
 resource "aws_security_group" "ssh_sg" {
   name        = "${var.project_name}-ssh-sg"
-  description = "Permite conexión SSH con tu IP"
+  description = "Permite conexion SSH con tu IP"
   vpc_id      = var.vpc_id
 
   ingress {
@@ -89,5 +89,30 @@ resource "aws_security_group" "ssh_sg" {
 
   tags = {
     Name = "${var.project_name}-ssh-sg"
+  }
+}
+
+# Security Group para ELB (ALB)
+resource "aws_security_group" "alb_sg" {
+  name        = "${var.project_name}-alb-sg"
+  description = "Permite trafico HTTP al ALB"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-alb-sg"
   }
 }

@@ -15,3 +15,10 @@ output "ssh_sg_id" {
   description = "ID del Grupo de Seguridad de SSH"
   value = aws_security_group.ssh_sg.id
 }
+
+# Muestra el ID del Grupo de Seguridad de el ALB
+output "alb_sg_id" {
+  description = "ID del Security Group del ALB"
+  value       = aws_security_group.alb_sg.id
+}
+

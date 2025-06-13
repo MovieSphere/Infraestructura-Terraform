@@ -1,5 +1,22 @@
-variable "project_name" {}
-variable "vpc_cidr" {}
-variable "public_subnet_cidr" {}
-variable "private_subnet_cidr" {}
-variable "availability_zone" {}
+variable "project_name" {
+  description = "Nombre del proyecto"
+  type        = string
+}
+variable "vpc_cidr" {
+  description = "CIDR del VPC"
+  type        = string
+}
+variable "public_subnet_cidrs" {
+  description = "CIDRs de subredes públicas"
+  type        = list(string)
+}
+
+variable "private_subnet_cidrs" {
+  description = "CIDRs de subredes privadas"
+  type        = list(string)
+}
+
+variable "availability_zones" {
+  description = "Zonas de disponibilidad para subredes"
+  type        = list(string)
+}

@@ -33,7 +33,7 @@ cd Infraestructura-Terraform
 
 2. Inicializar Terraform:
 ```bash
-cd Terraform
+cd Terraform/environments/develop
 terraform init
 ```
 
