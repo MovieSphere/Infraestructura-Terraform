@@ -11,7 +11,12 @@ resource "aws_instance" "ec2_ubuntu_docker" {
   # Solución para CKV_AWS_79 - Forzar IMDSv2
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens   = "required"  # Obliga a usar solo IMDSv2
+    http_tokens   = "required"
+  }
+
+  # Solución para CKV_AWS_8 - Encriptar volumen raíz
+  root_block_device {
+    encrypted = true  # Habilita encriptación para el volumen raíz
   }
 
   user_data = templatefile("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
