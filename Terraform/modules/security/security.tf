@@ -12,7 +12,7 @@ resource "aws_security_group" "ec2_sg" {
     security_groups = [aws_security_group.alb_sg.id]
   }
 
-  # Egress solo para puertos necesarios (ej: salida a internet por proxy o NAT)
+  # Egress solo para puertos necesarios
   egress {
     description = "Permite HTTP (80) y HTTPS (443)"
     from_port   = 80
@@ -115,10 +115,11 @@ resource "aws_security_group" "apigw_sg" {
   vpc_id      = var.vpc_id
 
   egress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = [aws_security_group.alb_sg.id] # Solo tráfico hacia el ALB
+    description      = "Tráfico egress HTTP hacia el ALB en puerto 80"
+    from_port        = 80
+    to_port          = 80
+    protocol         = "tcp"
+    security_groups  = [aws_security_group.alb_sg.id] # Solo tráfico hacia el ALB
   }
 
   tags = {
