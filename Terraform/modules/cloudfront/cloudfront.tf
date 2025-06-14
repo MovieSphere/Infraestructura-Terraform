@@ -61,3 +61,16 @@ resource "aws_cloudfront_distribution" "cdn" {
     }
   }
 }
+
+resource "aws_s3_bucket" "failover" {
+  bucket = "${var.bucket_name}-failover"
+}
+
+resource "aws_cloudfront_origin_access_identity" "failover_oai" {
+  comment = "OAI para acceso a S3 failover"
+}
+
+resource "aws_s3_bucket_policy" "failover_policy" {
+  bucket = aws_s3_bucket.failover.id
+  policy = data.aws_iam_policy_document.s3_oai.json
+}
