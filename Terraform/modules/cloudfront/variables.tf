@@ -28,3 +28,8 @@ variable "geo_locations" {
   type        = list(string)
   default     = ["PE"]
 }
+
+variable "waf_web_acl_arn" {
+  description = "ARN de WAF Web ACL para asociarlo con la distribución de CloudFront"
+  type        = string
+}

@@ -171,4 +171,6 @@ restrictions {
     }
   }
 
+  web_acl_id = var.waf_web_acl_arn
+
 }
