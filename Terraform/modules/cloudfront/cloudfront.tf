@@ -98,6 +98,67 @@ resource "aws_cloudfront_distribution" "cdn" {
   comment             = "CDN para ${var.bucket_name}"
   default_root_object = "index.html"
 
-  # 5. [CKV_AWS_310] - Origins con failover
-  
+
+  origin {
+    domain_name = var.bucket_domain
+    origin_id   = "s3-origin"
+
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.oai.cloudfront_access_identity_path
+    }
+  }
+
+  origin {
+    domain_name = aws_s3_bucket.failover.bucket_regional_domain_name
+    origin_id   = "failover-origin"
+
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.failover_oai.cloudfront_access_identity_path
+    }
+  }
+
+  origin_group {
+    origin_id = "origin-group-1"
+
+    failover_criteria {
+      status_codes = [403, 404, 500, 502, 503, 504]
+    }
+
+    member {
+      origin_id = "s3-origin"
+    }
+    member {
+      origin_id = "failover-origin"
+    }
+  }
+
+  default_cache_behavior {
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
+    target_origin_id       = "origin-group-1"
+    viewer_protocol_policy = "redirect-to-https"
+    compress               = true
+
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "none"
+      }
+    }
+
+    response_headers_policy_id = data.aws_cloudfront_response_headers_policy.security_headers.id
+  }
+
+  logging_config {
+    bucket = aws_s3_bucket.logs.bucket_domain_name
+    include_cookies = false
+    prefix = "cloudfront-logs/"
+  }
+
+  price_class = var.cf_price_class
+
+
+
+
+
 }
