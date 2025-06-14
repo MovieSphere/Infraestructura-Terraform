@@ -48,11 +48,12 @@ resource "aws_security_group" "rds_sg" {
     security_groups = [aws_security_group.ec2_sg.id] # Only EC2 instances
   }
 
+  # Egress vacío (sin necesidad de salida)
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = []
   }
 
   tags = {
@@ -74,10 +75,12 @@ resource "aws_security_group" "ssh_sg" {
     cidr_blocks = [var.user_ip_cidr] # Ip de la persona que quiera usar la conexión SSH
   }
 
+  # Salida solo por HTTP/HTTPS
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    description = "Permite salida web para actualizaciones"
+    from_port   = 80
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
