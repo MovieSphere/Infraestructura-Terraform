@@ -84,21 +84,23 @@ resource "aws_security_group" "ssh_sg" {
 # Security Group para ELB (ALB)
 resource "aws_security_group" "alb_sg" {
   name        = "${var.project_name}-alb-sg"
-  description = "Permite trafico HTTP al ALB"
+  description = "Permite tráfico HTTP al ALB"
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    security_groups = [aws_security_group.apigw_sg.id]
+    description      = "Tráfico HTTP desde el API Gateway"
+    from_port        = 80
+    to_port          = 80
+    protocol         = "tcp"
+    security_groups  = [aws_security_group.apigw_sg.id]
   }
 
   egress {
-    from_port       = 3000
-    to_port         = 3000
-    protocol    = "-1"
-    security_groups = [aws_security_group.ec2_sg.id]
+    description      = "Tráfico hacia EC2 en puerto 3000"
+    from_port        = 3000
+    to_port          = 3000
+    protocol         = "-1"
+    security_groups  = [aws_security_group.ec2_sg.id]
   }
 
   tags = {
