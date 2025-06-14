@@ -74,3 +74,12 @@ resource "aws_s3_bucket_policy" "failover_policy" {
   bucket = aws_s3_bucket.failover.id
   policy = data.aws_iam_policy_document.s3_oai.json
 }
+
+resource "aws_s3_bucket" "logs" {
+  bucket = "${var.bucket_name}-logs"
+}
+
+resource "aws_s3_bucket_acl" "logs_acl" {
+  bucket = aws_s3_bucket.logs.id
+  acl    = "log-delivery-write"
+}
