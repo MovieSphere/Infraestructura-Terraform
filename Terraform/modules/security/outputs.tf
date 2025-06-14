@@ -22,3 +22,8 @@ output "alb_sg_id" {
   value       = aws_security_group.alb_sg.id
 }
 
+# Muestra el ID del Grupo de Seguridad de el APIGateway
+output "apigw_sg_id" {
+  description = "ID del Security Group del APIGateway"
+  value = aws_security_group.apigw_sg.id
+}
