@@ -20,3 +20,8 @@ variable "availability_zones" {
   description = "Zonas de disponibilidad para subredes"
   type        = list(string)
 }
+
+variable "flow_logs_role_arn" {
+  description = "ARN del rol IAM para VPC Flow Logs"
+  type        = string
+}
