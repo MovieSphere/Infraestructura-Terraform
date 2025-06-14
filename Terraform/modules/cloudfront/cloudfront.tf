@@ -62,6 +62,9 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 }
 
+
+
+
 resource "aws_s3_bucket" "failover" {
   bucket = "${var.bucket_name}-failover"
 }
@@ -82,4 +85,19 @@ resource "aws_s3_bucket" "logs" {
 resource "aws_s3_bucket_acl" "logs_acl" {
   bucket = aws_s3_bucket.logs.id
   acl    = "log-delivery-write"
+}
+
+
+data "aws_cloudfront_response_headers_policy" "security_headers" {
+  name = "Managed-SecurityHeadersPolicy"
+}
+
+resource "aws_cloudfront_distribution" "cdn" {
+  enabled             = true
+  is_ipv6_enabled     = true
+  comment             = "CDN para ${var.bucket_name}"
+  default_root_object = "index.html"
+
+  # 5. [CKV_AWS_310] - Origins con failover
+  
 }
