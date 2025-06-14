@@ -125,3 +125,17 @@ resource "aws_cloudwatch_log_group" "vpc_logs" {
   name = "/aws/vpc/${var.project_name}-flow-logs"
 }
 
+# Desactiva todo tráfico en el Security Group por defecto
+resource "aws_default_security_group" "restrict_default" {
+  vpc_id = aws_vpc.main.id
+
+  # Reglas de entrada vacías
+  ingress =
+
+  # Reglas de salida vacías
+  egress =
+
+  tags = {
+    Name = "${var.project_name}-restricted-default-sg"
+  }
+}
