@@ -12,6 +12,73 @@ resource "aws_lb" "app_alb" {
   }
 }
 
+# Listener HTTPS (443) - Solución para CKV_AWS_2
+resource "aws_lb_listener" "https_listener" {
+  load_balancer_arn = aws_lb.app_alb.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"  # Requiere TLS 1.2 como mínimo
+  certificate_arn   = var.acm_certificate_arn  # Debes proporcionar este ARN
+
+  default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "404 Not Found"
+      status_code  = "404"
+    }
+  }
+}
+
+# Redirección HTTP → HTTPS - Solución para CKV2_AWS_20
+resource "aws_lb_listener" "http_redirect" {
+  load_balancer_arn = aws_lb.app_alb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+# Actualizar las reglas para usar el listener HTTPS
+resource "aws_lb_listener_rule" "auth_rule" {
+  listener_arn = aws_lb_listener.https_listener.arn  # Cambiado al listener HTTPS
+  priority     = 1
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tg_auth.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/auth/*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "user_rule" {
+  listener_arn = aws_lb_listener.https_listener.arn  # Cambiado al listener HTTPS
+  priority     = 2
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tg_user.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/user/*"]
+    }
+  }
+}
+
 resource "aws_lb_target_group" "tg" {
   name     = "${var.project_name}-tg"
   port     = 80
