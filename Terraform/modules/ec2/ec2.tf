@@ -8,6 +8,12 @@ resource "aws_instance" "ec2_ubuntu_docker" {
   monitoring                  = true
   iam_instance_profile        = var.iam_instance_profile
 
+  # Solución para CKV_AWS_79 - Forzar IMDSv2
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"  # Obliga a usar solo IMDSv2
+  }
+
   user_data = templatefile("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
     MS_AUTH_DB_URL = local.ms_auth_db_url
     MS_USER_DB_URL = local.ms_user_db_url
