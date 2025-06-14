@@ -5,9 +5,8 @@ resource "aws_instance" "ec2_ubuntu_docker" {
   subnet_id                   = var.private_id
   vpc_security_group_ids      = [var.ec2_sg_id]
   key_name                    = var.key_name
-
-  iam_instance_profile = var.iam_instance_profile
-
+  monitoring                  = true
+  iam_instance_profile        = var.iam_instance_profile
 
   user_data = templatefile("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
     MS_AUTH_DB_URL = local.ms_auth_db_url
