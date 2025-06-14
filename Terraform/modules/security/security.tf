@@ -48,14 +48,6 @@ resource "aws_security_group" "rds_sg" {
     security_groups = [aws_security_group.ec2_sg.id] # Only EC2 instances
   }
 
-  # Egress vacío (sin necesidad de salida)
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = []
-  }
-
   tags = {
     Name = "${var.project_name}-rds-sg"
   }
