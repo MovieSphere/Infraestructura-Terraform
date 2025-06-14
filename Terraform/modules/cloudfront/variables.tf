@@ -22,3 +22,9 @@ variable "acm_certificate_arn" {
   description = "ARN del certificado ACM para CloudFront"
   type        = string
 }
+
+variable "geo_locations" {
+  description = "Lista de países permitidos para geo restriction"
+  type        = list(string)
+  default     = ["PE"]
+}

@@ -164,7 +164,11 @@ viewer_certificate {
   }
  
 
-
-
+restrictions {
+    geo_restriction {
+      restriction_type = "whitelist"
+      locations        = var.geo_locations
+    }
+  }
 
 }
