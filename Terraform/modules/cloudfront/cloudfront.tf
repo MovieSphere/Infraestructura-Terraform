@@ -157,6 +157,12 @@ resource "aws_cloudfront_distribution" "cdn" {
 
   price_class = var.cf_price_class
 
+viewer_certificate {
+    acm_certificate_arn            = var.acm_certificate_arn
+    ssl_support_method             = "sni-only"
+    minimum_protocol_version       = "TLSv1.2_2021"
+  }
+ 
 
 
 

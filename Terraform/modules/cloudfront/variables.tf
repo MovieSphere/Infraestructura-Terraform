@@ -17,3 +17,8 @@ variable "cf_price_class" {
   description = "Clase de precio de CloudFront"
   type        = string
 }
+
+variable "acm_certificate_arn" {
+  description = "ARN del certificado ACM para CloudFront"
+  type        = string
+}
