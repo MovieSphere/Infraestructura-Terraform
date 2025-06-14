@@ -7,15 +7,13 @@ resource "aws_instance" "ec2_ubuntu_docker" {
   key_name                    = var.key_name
   monitoring                  = true
   iam_instance_profile        = var.iam_instance_profile
-  ebs_optimized               = true  # Solución para CKV_AWS_135
+  ebs_optimized               = true  
 
-  # Solución para CKV_AWS_79 - Forzar IMDSv2
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
 
-  # Solución para CKV_AWS_8 - Encriptar volumen raíz
   root_block_device {
     encrypted = true
   }
