@@ -28,3 +28,35 @@ resource "aws_iam_instance_profile" "cloudwatch_profile" {
   name = "${var.project_name}-cloudwatch-profile"
   role = aws_iam_role.cloudwatch_agent.name
 }
+
+resource "aws_iam_role" "flow_logs_role" {
+  name = "${var.project_name}-flow-logs-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "vpc-flow-logs.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "flow_logs_policy" {
+  name = "${var.project_name}-flow-logs-policy"
+  role = aws_iam_role.flow_logs_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Action = [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      Resource = "*"
+    }]
+  })
+}

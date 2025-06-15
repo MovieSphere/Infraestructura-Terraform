@@ -5,34 +5,28 @@ resource "aws_security_group" "ec2_sg" {
   vpc_id      = var.vpc_id
 
   ingress {
-    description = "Allow HTTP"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    description     = "Tráfico desde el ELB (ALB o NLB)"
+    from_port       = 3000
+    to_port         = 3000
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg.id]
   }
 
-  ingress {
-    description = "Allow HTTPS"
-    from_port   = 443
+  # Egress solo para puertos necesarios
+  egress {
+    description = "Permite HTTP (80) y HTTPS (443)"
+    from_port   = 80
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  ingress {
-    description = "Docker Compose servicios expuestos"
-    from_port   = 3000
-    to_port     = 3999
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    description     = "Permite conexión a RDS PostgreSQL"
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.rds_sg.id]
   }
 
   tags = {
@@ -54,13 +48,6 @@ resource "aws_security_group" "rds_sg" {
     security_groups = [aws_security_group.ec2_sg.id] # Only EC2 instances
   }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags = {
     Name = "${var.project_name}-rds-sg"
   }
@@ -80,10 +67,12 @@ resource "aws_security_group" "ssh_sg" {
     cidr_blocks = [var.user_ip_cidr] # Ip de la persona que quiera usar la conexión SSH
   }
 
+  # Salida solo por HTTP/HTTPS
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    description = "Permite salida web para actualizaciones"
+    from_port   = 80
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -95,24 +84,45 @@ resource "aws_security_group" "ssh_sg" {
 # Security Group para ELB (ALB)
 resource "aws_security_group" "alb_sg" {
   name        = "${var.project_name}-alb-sg"
-  description = "Permite trafico HTTP al ALB"
+  description = "Permite tráfico HTTP al ALB"
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    description      = "Tráfico HTTP desde el API Gateway"
+    from_port        = 80
+    to_port          = 80
+    protocol         = "tcp"
+    security_groups  = [aws_security_group.apigw_sg.id]
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    description      = "Tráfico hacia EC2 en puerto 3000"
+    from_port        = 3000
+    to_port          = 3000
+    protocol         = "-1"
+    security_groups  = [aws_security_group.ec2_sg.id]
   }
 
   tags = {
     Name = "${var.project_name}-alb-sg"
+  }
+}
+
+# Security Group para VPC Link / API Gateway
+resource "aws_security_group" "apigw_sg" {
+  name        = "${var.project_name}-apigw-sg"
+  description = "Permite integración privada entre API Gateway y ALB"
+  vpc_id      = var.vpc_id
+
+  egress {
+    description      = "Tráfico egress HTTP hacia el ALB en puerto 80"
+    from_port        = 80
+    to_port          = 80
+    protocol         = "tcp"
+    security_groups  = [aws_security_group.alb_sg.id] # Solo tráfico hacia el ALB
+  }
+
+  tags = {
+    Name = "${var.project_name}-apigw-sg"
   }
 }
