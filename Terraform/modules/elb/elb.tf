@@ -12,7 +12,7 @@ resource "aws_lb" "app_alb" {
   }
 }
 
-# Listener HTTPS (443) - Solución CKV_AWS_103
+
 resource "aws_lb_listener" "https_listener" {
   load_balancer_arn = aws_lb.app_alb.arn
   port              = 443
@@ -142,6 +142,66 @@ resource "aws_lb_listener_rule" "user_rule" {
     path_pattern {
       values = ["/user/*"]
     }
+  }
+}
+
+resource "aws_lb_target_group" "tg_auth" {
+  name     = "${var.project_name}-tg-auth"
+  port     = 8091
+  protocol = "HTTPS"  # Cambiado de HTTP a HTTPS
+  vpc_id   = var.vpc_id
+
+
+  health_check {
+    protocol            = "HTTPS"  # Actualizado de HTTP a HTTPS
+    path                = "/"      # Asegúrate que este endpoint soporte HTTPS
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200"
+  }
+}
+
+
+resource "aws_lb_target_group" "tg_user" {
+  name     = "${var.project_name}-tg-user"
+  port     = 8092
+  protocol = "HTTPS"  # Cambiado de HTTP a HTTPS
+  vpc_id   = var.vpc_id
+
+
+  health_check {
+    protocol            = "HTTPS"  # Actualizado de HTTP a HTTPS
+    path                = "/"      # Asegúrate que este endpoint soporte HTTPS
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200"
+  }
+}
+
+
+resource "aws_lb_target_group" "tg" {
+  name     = "${var.project_name}-tg"
+  port     = 80
+  protocol = "HTTPS"  # Cambiado de HTTP a HTTPS
+  vpc_id   = var.vpc_id
+
+  # Health check actualizado a HTTPS
+  health_check {
+    protocol            = "HTTPS"  # Actualizado de HTTP a HTTPS
+    path                = "/"      # Asegúrate que este endpoint soporte HTTPS
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200"
+  }
+
+  tags = {
+    Name = "${var.project_name}-tg"
   }
 }
 
