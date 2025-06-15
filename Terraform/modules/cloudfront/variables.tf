@@ -17,3 +17,19 @@ variable "cf_price_class" {
   description = "Clase de precio de CloudFront"
   type        = string
 }
+
+variable "acm_certificate_arn" {
+  description = "ARN del certificado ACM para CloudFront"
+  type        = string
+}
+
+variable "geo_locations" {
+  description = "Lista de países permitidos para geo restriction"
+  type        = list(string)
+  default     = ["PE"]
+}
+
+variable "waf_web_acl_arn" {
+  description = "ARN de WAF Web ACL para asociarlo con la distribución de CloudFront"
+  type        = string
+}
