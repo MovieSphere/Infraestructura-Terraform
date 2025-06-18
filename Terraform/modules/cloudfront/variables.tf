@@ -1,3 +1,8 @@
+variable "project_name" {
+  description = "Nombre del proyecto"
+  type        = string
+}
+
 variable "bucket_arn" {
   description = "ARN del bucket S3 al que CloudFront debe acceder"
   type        = string
@@ -16,4 +21,68 @@ variable "bucket_domain" {
 variable "cf_price_class" {
   description = "Clase de precio de CloudFront"
   type        = string
+}
+
+# Variables para WAF y seguridad
+variable "waf_web_acl_arn" {
+  description = "ARN del WAF Web ACL para CloudFront"
+  type        = string
+  default     = ""
+}
+
+variable "enable_access_logs" {
+  description = "Habilitar logs de acceso en CloudFront"
+  type        = bool
+  default     = false
+}
+
+variable "access_logs_bucket" {
+  description = "Bucket S3 para logs de acceso de CloudFront"
+  type        = string
+  default     = ""
+}
+
+variable "access_logs_prefix" {
+  description = "Prefijo para logs de acceso de CloudFront"
+  type        = string
+  default     = ""
+}
+
+variable "failover_bucket_domain" {
+  description = "Dominio del bucket S3 de failover para origin failover"
+  type        = string
+  default     = ""
+}
+
+# Variables para certificados SSL personalizados
+variable "enable_custom_ssl" {
+  description = "Habilitar certificado SSL personalizado en CloudFront"
+  type        = bool
+  default     = false
+}
+
+variable "acm_certificate_arn" {
+  description = "ARN del certificado ACM para CloudFront"
+  type        = string
+  default     = ""
+}
+
+variable "ssl_support_method" {
+  description = "Método de soporte SSL para CloudFront"
+  type        = string
+  default     = "sni-only"
+  validation {
+    condition     = contains(["sni-only", "vip"], var.ssl_support_method)
+    error_message = "ssl_support_method debe ser 'sni-only' o 'vip'."
+  }
+}
+
+variable "minimum_protocol_version" {
+  description = "Versión mínima del protocolo SSL/TLS"
+  type        = string
+  default     = "TLSv1.2_2021"
+  validation {
+    condition     = contains(["TLSv1", "TLSv1.1", "TLSv1.2_2019", "TLSv1.2_2021", "TLSv1.3"], var.minimum_protocol_version)
+    error_message = "minimum_protocol_version debe ser una versión válida de TLS."
+  }
 }
