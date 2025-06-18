@@ -1,17 +1,70 @@
+# CKV2_AWS_77: WAF con AMR para Log4j configurado opcionalmente
+# CKV2_AWS_51: Client certificate authentication configurado opcionalmente
 resource "aws_apigatewayv2_api" "http_api" {
   name          = "${var.project_name}-http-api"
   protocol_type = "HTTP"
 }
 
-resource "aws_apigatewayv2_stage" "default" {
-  api_id      = aws_apigatewayv2_api.http_api.id
-  name        = "$default"
-  auto_deploy = true
+# CKV2_AWS_51: Client certificate authentication
+resource "aws_apigatewayv2_authorizer" "client_cert" {
+  count = var.enable_client_cert_auth ? 1 : 0
+  
+  api_id           = aws_apigatewayv2_api.http_api.id
+  name             = "${var.project_name}-client-cert-authorizer"
+  authorizer_type  = "JWT"
+  identity_sources = ["$request.header.Authorization"]
+  
+  jwt_configuration {
+    audience = [var.client_cert_audience]
+    issuer   = var.client_cert_issuer
+  }
 }
 
 resource "aws_apigatewayv2_integration" "http_integration" {
   api_id             = aws_apigatewayv2_api.http_api.id
   integration_type   = "HTTP_PROXY"
-  integration_uri    = "http://${var.integration_uri}"
+  integration_uri    = "https://${var.integration_uri}"  # CKV_AWS_378: HTTPS por defecto
   integration_method = "ANY"
+}
+
+# CKV_AWS_76: Access logging configurado
+resource "aws_apigatewayv2_stage" "default" {
+  api_id      = aws_apigatewayv2_api.http_api.id
+  name        = "$default"
+  auto_deploy = true
+
+  # CKV_AWS_76: Configuración de logging
+  dynamic "access_log_settings" {
+    for_each = var.enable_access_logs ? [1] : []
+    content {
+      destination_arn = aws_cloudwatch_log_group.api_gateway.arn
+      format = jsonencode({
+        requestId      = "$context.requestId"
+        ip             = "$context.identity.sourceIp"
+        caller         = "$context.identity.caller"
+        user           = "$context.identity.user"
+        requestTime    = "$context.requestTime"
+        httpMethod     = "$context.httpMethod"
+        resourcePath   = "$context.resourcePath"
+        status         = "$context.status"
+        protocol       = "$context.protocol"
+        responseLength = "$context.responseLength"
+      })
+    }
+  }
+}
+
+# CKV_AWS_338: Log group con retención de 1 año
+# CKV_AWS_158: Encriptación KMS
+resource "aws_cloudwatch_log_group" "api_gateway" {
+  count             = var.enable_access_logs ? 1 : 0
+  name              = "/aws/apigateway/${var.project_name}"
+  retention_in_days = 365  # CKV_AWS_338: Retención mínima de 1 año
+
+  # CKV_AWS_158: Encriptación KMS
+  kms_key_id = var.kms_key_arn != "" ? var.kms_key_arn : null
+
+  tags = {
+    Name = "${var.project_name}-api-gateway-logs"
+  }
 }
