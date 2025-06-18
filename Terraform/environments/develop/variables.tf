@@ -72,6 +72,12 @@ variable "db_password" {
   sensitive = true
 }
 
+variable "alarm_email" {
+  type = string
+  description = "Correo al que se enviarán las alertas"
+  default = "jromerou2@upao.edu.pe"
+}
+
 variable "environment" {
   type    = string
   default = "dev"
@@ -106,4 +112,3 @@ variable "monitoring_role_arn" {
   description = "ARN del rol de IAM usado para monitoreo de RDS (o CloudWatch)"
   type        = string
 }
-

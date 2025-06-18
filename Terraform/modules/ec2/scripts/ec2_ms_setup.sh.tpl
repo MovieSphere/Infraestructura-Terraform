@@ -101,6 +101,8 @@ services:
       DB_URL: \$\${MS_AUTH_DB_URL}
       DB_USERNAME: \$\${DB_USERNAME}
       DB_PASSWORD: \$\${DB_PASSWORD}
+    volumes:
+      - shared-logs:/app/logs
     depends_on: []
 
   ms_user_service:
@@ -113,6 +115,8 @@ services:
       DB_URL: \$\${MS_USER_DB_URL}
       DB_USERNAME: \$\${DB_USERNAME}
       DB_PASSWORD: \$\${DB_PASSWORD}
+    volumes:
+      - shared-logs:/app/logs
     depends_on: []
 
 
