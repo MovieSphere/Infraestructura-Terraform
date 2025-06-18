@@ -56,8 +56,9 @@ module "ec2" {
   ec2_sg_id     = module.security.ec2_sg_id
   key_name      = var.key_name
 
-  auth_db_host = module.rds.auth_db_address
-  user_db_host = module.rds.users_db_address
+  auth_db_host    = module.rds.auth_db_address
+  user_db_host    = module.rds.users_db_address
+  catalog_db_host = module.rds.catalog_db_address
 
   db_username = var.db_username
   db_password = var.db_password
