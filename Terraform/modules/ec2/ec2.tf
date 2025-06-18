@@ -23,6 +23,7 @@ resource "aws_instance" "ec2_ubuntu_docker" {
     MS_USER_DB_URL = local.ms_user_db_url
     DB_USERNAME    = var.db_username
     DB_PASSWORD    = var.db_password
+    OPENSEARCH_URL = module.opensearch.opensearch_endpoint
   })
 
   tags = {
