@@ -69,6 +69,13 @@ runuser -l ubuntu -c "
   # Clonar repositorios
   git clone https://github.com/MovieSphere/ms_user_service.git
   git clone https://github.com/MovieSphere/ms_auth_service.git
+  
+  git clone https://github.com/MovieSphere/ms_movie_service.git
+  git clone https://github.com/MovieSphere/ms_actor_service.git
+  git clone https://github.com/MovieSphere/ms_rating_service.git
+  git clone https://github.com/MovieSphere/ms_recomendation_service.git
+  git clone https://github.com/MovieSphere/ms_catalog_search_service.git
+
 
   # Crear archivo .env
   cat <<EOT > .env
