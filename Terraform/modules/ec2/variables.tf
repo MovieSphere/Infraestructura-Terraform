@@ -39,3 +39,8 @@ variable "iam_instance_profile" {
   description = "Nombre del perfil de instancia IAM para CloudWatch"
   type        = string
 }
+
+variable "opensearch_endpoint" {
+  description = "Endpoint del clúster OpenSearch"
+  type        = string
+}

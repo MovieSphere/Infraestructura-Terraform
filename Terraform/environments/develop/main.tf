@@ -21,14 +21,14 @@ module "cloudwatch" {
   project_name    = var.project_name
   region          = var.region
   ec2_instance_id = module.ec2.instance_id
-  alarm_actions   = [module.monitoring.alerts_topic_arn] # Aqui se puede configurar el envio de SNS
+  alarm_actions   = [module.logs.alerts_topic_arn] # Aqui se puede configurar el envio de SNS
 }
 
 module "api_gateway" {
   source          = "../../modules/api_gateway"
   project_name    = var.project_name
   integration_uri = module.alb.alb_dns_name
-  kms_key_arn     = module.iam.kms_key_id
+  kms_key_arn     = var.kms_key_id
 }
 
 module "rds" {
@@ -39,7 +39,7 @@ module "rds" {
   db_instance_class    = var.db_instance_class
   rds_sg_id            = module.security.rds_sg_id
   db_subnet_group_name = module.vpc.db_subnet_group_name
-  monitoring_role_arn  = module.iam.rds_monitoring_role_arn
+  monitoring_role_arn  = var.monitoring_role_arn
 }
 
 module "iam" {
@@ -64,6 +64,7 @@ module "ec2" {
   db_password = var.db_password
 
   iam_instance_profile = module.iam.aws_iam_instance_profile
+  opensearch_endpoint = module.opensearch.opensearch_endpoint
 }
 
 module "alb" {

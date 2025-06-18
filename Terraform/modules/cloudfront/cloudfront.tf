@@ -67,22 +67,6 @@ resource "aws_cloudfront_distribution" "cdn" {
     cache_policy_id             = "658327ea-f89d-4fab-a63d-7e88639e58f6" # Managed-CachingOptimized
     origin_request_policy_id    = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" # Managed-CORS-S3Origin
     response_headers_policy_id  = "67f7725c-6f97-4210-82d7-5512b31e9d03" # Managed-SecurityHeadersPolicy
-
-    dynamic "origin_group" {
-      for_each = var.failover_bucket_domain != "" ? [1] : []
-      content {
-        origin_id = "s3-origin-group"
-        failover_criteria {
-          status_codes = [500, 502, 503, 504]
-        }
-        member {
-          origin_id = "s3-origin"
-        }
-        member {
-          origin_id = "s3-failover-origin"
-        }
-      }
-    }
   }
 
   dynamic "ordered_cache_behavior" {
@@ -124,6 +108,7 @@ resource "aws_cloudfront_distribution" "cdn" {
 
   restrictions {
     geo_restriction {
+      restriction_type = "none"
       locations       = ["US", "CA", "MX", "BR", "AR", "CL", "CO", "PE", "VE", "EC", "BO", "PY", "UY", "GY", "SR", "GF", "FK"]
     }
   }
