@@ -86,3 +86,48 @@ variable "cf_price_class" {
   type        = string
   default     = "PriceClass_100"
 }
+
+variable "monitoring_role_arn" {
+  description = "ARN del rol IAM para monitoreo mejorado de RDS"
+  type        = string
+}
+
+variable "kms_key_id" {
+  description = "KMS Key ARN para cifrado del bucket S3"
+  type        = string
+}
+
+variable "flow_logs_role_arn" {
+  description = "ARN del rol para VPC Flow Logs"
+  type        = string
+}
+
+variable "acm_certificate_arn" {
+  description = "ARN del certificado TLS para el ALB (valor temporal)"
+  type        = string
+  default     = "arn:aws:acm:us-east-1:000000000000:certificate/mock-certificate"
+}
+
+variable "alb_sg_id" {
+  description = "ID del Security Group usado por el ALB"
+  type        = string
+  default     = "sg-0123456789abcdef0"
+}
+
+variable "public_subnet_ids" {
+  description = "Lista de subnets públicas donde se ubicará el ALB"
+  type        = list(string)
+  default     = ["subnet-0abc1111", "subnet-0abc2222"]
+}
+
+variable "vpc_id" {
+  description = "ID del VPC al que pertenece el ALB y otros recursos"
+  type        = string
+  default     = "vpc-0123456789abcdef0"
+}
+
+variable "instance_ids" {
+  description = "Lista de instancias EC2 que se conectarán al ALB"
+  type        = list(string)
+  default     = ["i-0123456789abcde01", "i-0123456789abcde02"]
+}

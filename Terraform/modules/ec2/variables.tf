@@ -25,6 +25,10 @@ variable "auth_db_host" {
 variable "user_db_host" {
   description = "Url del DB de User"
 }
+
+variable "catalog_db_host" {
+  description = "Url del DB de Catalog"
+}
 variable "db_username" {
   description = "Username para ingresar a la BD"
 }

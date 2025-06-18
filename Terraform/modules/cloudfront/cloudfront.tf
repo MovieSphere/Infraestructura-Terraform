@@ -25,6 +25,12 @@ resource "aws_cloudfront_distribution" "cdn" {
   comment             = "CDN para ${var.bucket_name}"
   default_root_object = "index.html"
 
+  logging_config {
+    bucket = "${var.log_bucket_name}.s3.amazonaws.com"
+    include_cookies = false
+    prefix  = "cloudfront/"
+  }
+
   origin {
     domain_name = var.bucket_domain
     origin_id   = "s3-origin"
@@ -53,11 +59,13 @@ resource "aws_cloudfront_distribution" "cdn" {
 
   viewer_certificate {
     cloudfront_default_certificate = true
+    minimum_protocol_version       = "TLSv1.2_2021"
   }
 
   restrictions {
     geo_restriction {
-      restriction_type = "none"
+       restriction_type = "whitelist"
+      locations        = ["US"]
     }
   }
 }

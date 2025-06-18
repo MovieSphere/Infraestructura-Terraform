@@ -16,4 +16,9 @@ variable "bucket_domain" {
 variable "cf_price_class" {
   description = "Clase de precio de CloudFront"
   type        = string
+  }
+
+variable "log_bucket_name" {
+  description = "Bucket donde se almacenan los logs de CloudFront"
+  type        = string
 }

@@ -1,0 +1,3 @@
+
+# Ignore sensitive terraform config
+terraform.tfvars
