@@ -107,9 +107,7 @@ resource "aws_lb_target_group_attachment" "user_attachment" {
   port             = 8092
 }
 
-# Listener HTTP que redirige a HTTPS si está habilitado
-# checkov:skip=CKV_AWS_103:HTTPS no disponible sin dominio propio - usando dominio AWS por defecto
-# checkov:skip=CKV_AWS_2:Protocolo HTTP necesario para desarrollo sin certificado ACM
+
 resource "aws_lb_listener" "http_listener" {
   load_balancer_arn = aws_lb.app_alb.arn
   port              = 80
@@ -125,8 +123,7 @@ resource "aws_lb_listener" "http_listener" {
   }
 }
 
-# Listener HTTPS si se habilita
-# checkov:skip=CKV_AWS_103:HTTPS configurado cuando se proporciona certificado ACM
+
 resource "aws_lb_listener" "https_listener" {
   count             = var.enable_https && var.acm_certificate_arn != "" ? 1 : 0
   load_balancer_arn = aws_lb.app_alb.arn

@@ -1,6 +1,6 @@
 # File: modules/s3/notification.tf
 
-resource "aws_s3_bucket_notification" "frontend" {
+resource "aws_s3_bucket_notification" "frontend_2" {
   bucket = aws_s3_bucket.frontend.id
 
   topic {

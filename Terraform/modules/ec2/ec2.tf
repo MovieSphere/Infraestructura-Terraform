@@ -35,3 +35,4 @@ locals {
   ms_auth_db_url = "jdbc:postgresql://${var.auth_db_host}:5432/authdb"
   ms_user_db_url = "jdbc:postgresql://${var.user_db_host}:5432/userdb"
 }
+

@@ -25,7 +25,7 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 
-*.xml
+results_junitxml.xml
 
 # Ignore transient lock info files created by terraform apply
 .terraform.tfstate.lock.info
@@ -44,3 +44,41 @@ settings.json
 
 # Ignore the lambda function
 lambda_function.zip
+
+# Archivos de configuración con credenciales
+.env
+*.env
+
+# Resultados de Checkov
+results.xml
+checkov-results/
+
+# Logs de Jenkins
+jenkins_home/
+*.log
+
+# Archivos temporales de Docker
+.dockerignore
+
+# Archivos de Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Archivos de AWS
+.aws/
+
+# Archivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de backup
+*.bak
+*.backup

@@ -50,3 +50,9 @@ variable "client_cert_issuer" {
   type        = string
   default     = ""
 }
+
+variable "acm_certificate_arn" {
+  description = "ARN of the ACM certificate to use for a custom domain"
+  type        = string
+  default     = ""   
+}
