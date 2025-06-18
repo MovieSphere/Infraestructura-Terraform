@@ -83,3 +83,8 @@ module "cloudfront" {
   bucket_domain  = module.s3.bucket_domain
   cf_price_class = var.cf_price_class
 }
+
+module "opensearch" {
+  source = "../../modules/opensearch"
+  region = var.region
+}
