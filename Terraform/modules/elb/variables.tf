@@ -18,11 +18,6 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "acm_certificate_arn" {
-  description = "ARN del certificado SSL para HTTPS Listener"
-  type        = string
-}
-
 variable "instance_ids" {
   description = "Lista de instancias EC2 que serán registradas en los target groups"
   type        = list(string)

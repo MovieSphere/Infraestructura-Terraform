@@ -17,11 +17,11 @@ module "security" {
 }
 
 module "cloudwatch" {
-  source           = "../../modules/cloudwatch"
-  project_name     = var.project_name
-  region           = var.region
-  ec2_instance_id  = module.ec2.instance_id
-  alarm_actions    = [module.monitoring.alerts_topic_arn] # Aqui se puede configurar el envio de SNS
+  source          = "../../modules/cloudwatch"
+  project_name    = var.project_name
+  region          = var.region
+  ec2_instance_id = module.ec2.instance_id
+  alarm_actions   = [module.monitoring.alerts_topic_arn] # Aqui se puede configurar el envio de SNS
 }
 
 module "api_gateway" {
@@ -58,35 +58,22 @@ module "ec2" {
 
   auth_db_host = module.rds.auth_db_address
   user_db_host = module.rds.users_db_address
-  db_username  = var.db_username
-  db_password  = var.db_password
-}
 
-module "ec2" {
-  source               = "../../modules/ec2"
-  project_name         = var.project_name
-  ami_id               = var.ami_id
-  instance_type        = var.instance_type
-  private_id           = module.vpc.private_subnet_ids[0]
-  ec2_sg_id            = module.security.ec2_sg_id
-  key_name             = var.key_name
-  auth_db_host         = module.rds.auth_db_address
-  user_db_host         = module.rds.users_db_address
-  catalog_db_host      = module.rds.catalog_db_address
-  db_username          = var.db_username
-  db_password          = var.db_password
+  db_username = var.db_username
+  db_password = var.db_password
+
   iam_instance_profile = module.iam.aws_iam_instance_profile
 }
 
 module "alb" {
   # Valor temporal para avanzar. Reemplazar con ARN real del certificado HTTPS cuando esté disponible.
   acm_certificate_arn = "arn:aws:acm:us-east-1:000000000000:certificate/mock-certificate"
-  source            = "../../modules/elb"
-  project_name      = var.project_name
-  alb_sg_id         = module.security.alb_sg_id
-  vpc_id            = module.vpc.vpc_id
-  public_subnet_ids = module.vpc.public_subnet_ids
-  instance_ids      = [module.ec2.instance_id]
+  source              = "../../modules/elb"
+  project_name        = var.project_name
+  alb_sg_id           = module.security.alb_sg_id
+  vpc_id              = module.vpc.vpc_id
+  public_subnet_ids   = module.vpc.public_subnet_ids
+  instance_ids        = [module.ec2.instance_id]
 }
 
 module "logs" {
@@ -117,10 +104,11 @@ module "media" {
 }
 
 module "cloudfront" {
-  source           = "../../modules/cloudfront"
-  bucket_arn       = module.s3.bucket_arn
-  bucket_name      = module.s3.bucket_name
-  bucket_domain    = module.s3.bucket_domain
-  cf_price_class   = var.cf_price_class
-  log_bucket_name  = module.s3.bucket_name
+  source          = "../../modules/cloudfront"
+  project_name    = var.project_name
+  bucket_arn      = module.s3.bucket_arn
+  bucket_name     = module.s3.bucket_name
+  bucket_domain   = module.s3.bucket_domain
+  cf_price_class  = var.cf_price_class
+  log_bucket_name = module.s3.bucket_name
 }
