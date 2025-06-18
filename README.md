@@ -113,15 +113,15 @@ terraform destroy
 3. Probar los endpoints:
    - recommendation:
      ```bash
-     curl http://localhost:8096/api/recommend?q=accion
+     http://localhost:8096/api/recommend?q=accion
      ```
    - catalog_search:
      ```bash
-     curl http://localhost:8097/api/search?q=pelicula
+     http://localhost:8097/api/search?q=pelicula
      ```
 4. El servicio de OpenSearch deberá estar disponible en: 
      ```bash
-     curl -XGET `http://<endpoint_opensearch>:9200`
+     http://<endpoint_opensearch>:9200
      ```
     NOTA: Terraform proporcionará el endpoint el cual se reemplazará por <endpoint_opensearch>
     ejemplo: http://search-moviesphere-xxxx.region.es.amazonaws.com:9200
