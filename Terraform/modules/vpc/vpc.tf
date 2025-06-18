@@ -189,10 +189,10 @@ resource "aws_default_security_group" "restrict_default" {
   vpc_id = aws_vpc.main.id
 
   # Reglas de entrada vacías
-  ingress = {}
+  ingress = []
 
   # Reglas de salida vacías
-  egress = {}
+  egress = []
 
   tags = {
     Name = "${var.project_name}-restricted-default-sg"

@@ -23,6 +23,11 @@ variable "cf_price_class" {
   type        = string
 }
 
+variable "log_bucket_name" {
+  description = "Bucket donde se almacenan los logs de CloudFront"
+  type        = string
+}
+
 # Variables para WAF y seguridad
 variable "waf_web_acl_arn" {
   description = "ARN del WAF Web ACL para CloudFront"

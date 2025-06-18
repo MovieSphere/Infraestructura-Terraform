@@ -33,3 +33,21 @@ variable "monitoring_role_arn" {
   description = "ARN del IAM Role para Enhanced Monitoring"
   type        = string
 }
+
+variable "backup_retention_period" {
+  description = "Días de retención de backups de RDS"
+  type        = number
+  default     = 7
+}
+
+variable "backup_window" {
+  description = "Ventana de tiempo para los backups"
+  type        = string
+  default     = "03:00-04:00"
+}
+
+variable "parameter_group_name" {
+  description = "Nombre del grupo de parámetros de la base de datos"
+  type        = string
+  default     = ""
+}

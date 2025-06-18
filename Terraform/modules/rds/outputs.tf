@@ -4,4 +4,8 @@ output "auth_db_address" {
 
 output "users_db_address" {
   value = aws_db_instance.users_db.address
+  }
+
+output "catalog_db_address" {
+  value = aws_db_instance.catalog_db.address
 }

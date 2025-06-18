@@ -7,10 +7,18 @@ output "cloudwatch_dashboard_name" {
   value = module.cloudwatch.dashboard_name
 }
 
-output "sns_alerts_topic_arn" {
-  value = module.monitoring.alerts_topic_arn
+output "media_bucket_name" {
+  value = module.media.media_bucket_name
 }
 
-output "log_group" {
-  value = module.monitoring.log_group_name
+output "media_bucket_arn" {
+  value = module.media.media_bucket_arn
+  }
+
+output "mongodb_endpoint" {
+  value = module.mongodb.docdb_endpoint
+}
+
+output "redis_endpoint" {
+  value = module.redis.memorydb_endpoint
 }

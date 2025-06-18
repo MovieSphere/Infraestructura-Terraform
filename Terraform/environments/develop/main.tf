@@ -5,8 +5,8 @@ module "vpc" {
   public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
   availability_zones   = var.availability_zones
+  flow_logs_role_arn   = module.iam.vpc_flow_logs_role_arn
   aws_region           = var.region
-  flow_logs_role_arn   = module.iam.flow_logs_role_arn
 }
 
 module "security" {
@@ -60,11 +60,27 @@ module "ec2" {
   user_db_host = module.rds.users_db_address
   db_username  = var.db_username
   db_password  = var.db_password
+}
 
+module "ec2" {
+  source               = "../../modules/ec2"
+  project_name         = var.project_name
+  ami_id               = var.ami_id
+  instance_type        = var.instance_type
+  private_id           = module.vpc.private_subnet_ids[0]
+  ec2_sg_id            = module.security.ec2_sg_id
+  key_name             = var.key_name
+  auth_db_host         = module.rds.auth_db_address
+  user_db_host         = module.rds.users_db_address
+  catalog_db_host      = module.rds.catalog_db_address
+  db_username          = var.db_username
+  db_password          = var.db_password
   iam_instance_profile = module.iam.aws_iam_instance_profile
 }
 
 module "alb" {
+  # Valor temporal para avanzar. Reemplazar con ARN real del certificado HTTPS cuando esté disponible.
+  acm_certificate_arn = "arn:aws:acm:us-east-1:000000000000:certificate/mock-certificate"
   source            = "../../modules/elb"
   project_name      = var.project_name
   alb_sg_id         = module.security.alb_sg_id
@@ -82,25 +98,29 @@ module "logs" {
   ec2_instance_id = module.ec2.instance_id
 }
 
+
+
 module "s3" {
   source        = "../../modules/s3"
   project_name  = var.project_name
   environment   = var.environment
   bucket_suffix = var.bucket_suffix
-  bucket_name   = "${var.project_name}-${var.environment}-${var.bucket_suffix}"
-  kms_key_id    = module.iam.kms_key_id
+  bucket_name   = "${var.project_name}-${var.environment}"
+  kms_key_id    = var.kms_key_id
+}
+
+module "media" {
+  source        = "../../modules/media"
+  project_name  = var.project_name
+  environment   = var.environment
+  bucket_suffix = var.bucket_suffix
 }
 
 module "cloudfront" {
-  source         = "../../modules/cloudfront"
-  project_name   = var.project_name
-  bucket_arn     = module.s3.bucket_arn
-  bucket_name    = module.s3.bucket_name
-  bucket_domain  = module.s3.bucket_domain
-  cf_price_class = var.cf_price_class
-}
-
-module "opensearch" {
-  source = "../../modules/opensearch"
-  region = var.region
+  source           = "../../modules/cloudfront"
+  bucket_arn       = module.s3.bucket_arn
+  bucket_name      = module.s3.bucket_name
+  bucket_domain    = module.s3.bucket_domain
+  cf_price_class   = var.cf_price_class
+  log_bucket_name  = module.s3.bucket_name
 }

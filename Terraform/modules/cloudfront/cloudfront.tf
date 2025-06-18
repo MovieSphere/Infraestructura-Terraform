@@ -32,8 +32,13 @@ resource "aws_cloudfront_distribution" "cdn" {
   is_ipv6_enabled     = true
   comment             = "CDN para ${var.bucket_name}"
   default_root_object = "index.html"
-
   web_acl_id = var.waf_web_acl_arn != "" ? var.waf_web_acl_arn : null
+  
+  logging_config {
+    bucket = "${var.log_bucket_name}.s3.amazonaws.com"
+    include_cookies = false
+    prefix  = "cloudfront/"
+  }
 
   origin {
     domain_name = var.bucket_domain
@@ -111,15 +116,14 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = !var.enable_custom_ssl
+    cloudfront_default_certificate = true
+    minimum_protocol_version       = "TLSv1.2_2021"
     acm_certificate_arn           = var.enable_custom_ssl ? var.acm_certificate_arn : null
     ssl_support_method            = var.ssl_support_method
-    minimum_protocol_version      = var.minimum_protocol_version
   }
 
   restrictions {
     geo_restriction {
-      restriction_type = "whitelist"
       locations       = ["US", "CA", "MX", "BR", "AR", "CL", "CO", "PE", "VE", "EC", "BO", "PY", "UY", "GY", "SR", "GF", "FK"]
     }
   }

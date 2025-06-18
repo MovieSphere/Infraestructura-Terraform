@@ -21,6 +21,7 @@ resource "aws_instance" "ec2_ubuntu_docker" {
   user_data = templatefile("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
     MS_AUTH_DB_URL = local.ms_auth_db_url
     MS_USER_DB_URL = local.ms_user_db_url
+    MS_CATALOG_DB_URL = local.ms_catalog_db_url
     DB_USERNAME    = var.db_username
     DB_PASSWORD    = var.db_password
     OPENSEARCH_URL = module.opensearch.opensearch_endpoint
@@ -34,5 +35,5 @@ resource "aws_instance" "ec2_ubuntu_docker" {
 locals {
   ms_auth_db_url = "jdbc:postgresql://${var.auth_db_host}:5432/authdb"
   ms_user_db_url = "jdbc:postgresql://${var.user_db_host}:5432/userdb"
+  ms_catalog_db_url = "jdbc:postgresql://${var.catalog_db_host}:5432/catalogdb"
 }
-

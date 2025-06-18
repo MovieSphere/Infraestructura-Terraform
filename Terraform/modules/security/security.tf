@@ -155,7 +155,7 @@ resource "aws_security_group" "alb_sg" { # checkov:skip=CKV2_AWS_5: SG para ALB,
     protocol        = "tcp"
     security_groups = [aws_security_group.ec2_sg.id]
   }
-
+  
   tags = {
     Name = "${var.project_name}-alb-sg"
   }
@@ -178,4 +178,56 @@ resource "aws_security_group" "apigw_sg" { # checkov:skip=CKV2_AWS_5: SG de API 
   tags = {
     Name = "${var.project_name}-apigw-sg"
   }
+}
+
+### RULES SEPARATED TO AVOID CYCLES
+
+# ALB --> EC2
+resource "aws_security_group_rule" "alb_to_ec2" {
+  type                     = "ingress"
+  from_port                = 3000
+  to_port                  = 3000
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.alb_sg.id
+  security_group_id        = aws_security_group.ec2_sg.id
+}
+
+# EC2 --> RDS
+resource "aws_security_group_rule" "ec2_to_rds" {
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.ec2_sg.id
+  security_group_id        = aws_security_group.rds_sg.id
+}
+
+# API Gateway --> ALB
+resource "aws_security_group_rule" "apigw_to_alb" {
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.apigw_sg.id
+  security_group_id        = aws_security_group.alb_sg.id
+}
+
+# ALB --> EC2 (simulated egress as ingress if needed)
+resource "aws_security_group_rule" "alb_egress_to_ec2" {
+  type                     = "egress"
+  from_port                = 3000
+  to_port                  = 3000
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.ec2_sg.id
+  security_group_id        = aws_security_group.alb_sg.id
+}
+
+# API Gateway --> ALB egress
+resource "aws_security_group_rule" "apigw_egress_to_alb" {
+  type                     = "egress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.alb_sg.id
+  security_group_id        = aws_security_group.apigw_sg.id
 }
