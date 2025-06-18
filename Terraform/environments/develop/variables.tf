@@ -53,7 +53,7 @@ variable "instance_type" {
 
 variable "db_instance_class" {
   description = "Tipo de instancia RDS"
-  default = "db.t3.micro"
+  default     = "db.t3.micro"
 }
 
 variable "key_name" {
@@ -73,16 +73,37 @@ variable "db_password" {
 }
 
 variable "environment" {
-  type        = string
-  default     = "dev"
+  type    = string
+  default = "dev"
 }
 
 variable "bucket_suffix" {
-  type        = string
-  default     = ""
+  type    = string
+  default = ""
 }
 
 variable "cf_price_class" {
-  type        = string
-  default     = "PriceClass_100"
+  type    = string
+  default = "PriceClass_100"
 }
+
+variable "kms_key_id" {
+  description = "KMS Key ID or ARN to use for S3 bucket and other encryptions"
+  type        = string
+}
+
+variable "flow_logs_role_arn" {
+  description = "ARN del IAM Role para los VPC Flow Logs"
+  type        = string
+}
+
+variable "acm_certificate_arn" {
+  description = "ARN del certificado ACM para usar en API Gateway u otros servicios"
+  type        = string
+}
+
+variable "monitoring_role_arn" {
+  description = "ARN del rol de IAM usado para monitoreo de RDS (o CloudWatch)"
+  type        = string
+}
+
