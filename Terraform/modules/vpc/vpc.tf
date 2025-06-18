@@ -15,7 +15,7 @@ resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = var.public_subnet_cidrs[count.index]
   availability_zone       = var.availability_zones[count.index]
-  map_public_ip_on_launch = false
+  map_public_ip_on_launch = true
 
   tags = {
     Name = "${var.project_name}-public-subnet-${count.index}"
@@ -36,40 +36,44 @@ resource "aws_subnet" "private" {
 
 # NAT Gateway
 resource "aws_eip" "nat" {
+  count  = length(var.public_subnet_cidrs)
   domain = "vpc"
+  
   tags = {
-    Name = "${var.project_name}-nat-eip"
+    Name = "${var.project_name}-nat-eip-${count.index}"
   }
 }
 
 resource "aws_nat_gateway" "nat" {
-  allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.public[0].id
-
+  count         = length(var.public_subnet_cidrs)
+  allocation_id = aws_eip.nat[count.index].id
+  subnet_id     = aws_subnet.public[count.index].id
+  
   tags = {
-    Name = "${var.project_name}-nat-gw"
+    Name = "${var.project_name}-nat-gw-${count.index}"
   }
 }
 
+
 # Tabla de rutas privadas
 resource "aws_route_table" "private" {
+  count  = length(var.private_subnet_cidrs)
+
   vpc_id = aws_vpc.main.id
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat.id
+    nat_gateway_id = aws_nat_gateway.nat[count.index].id
   }
 
-  tags = {
-    Name = "${var.project_name}-private-rt"
-  }
+  tags = { Name = "${var.project_name}-private-rt-${count.index}" }
 }
 
 # Asociación con subredes privadas
 resource "aws_route_table_association" "private_assoc" {
-  count          = length(aws_subnet.private)
+  count          = length(var.private_subnet_cidrs)
   subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private.id
+  route_table_id = aws_route_table.private[count.index].id
 }
 
 # Internet Gateway
@@ -121,8 +125,63 @@ resource "aws_flow_log" "vpc_flow_log" {
   iam_role_arn         = var.flow_logs_role_arn
 }
 
+data "aws_caller_identity" "current" {}
+
+# KMS Key para los logs
+resource "aws_kms_key" "cw_logs" {
+  description             = "KMS key for CloudWatch VPC Flow Logs"
+  deletion_window_in_days = 30
+  enable_key_rotation     = true
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Id": "key-default-1",
+  "Statement": [
+    {
+      "Sid": "Allow administration of the key",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+      },
+      "Action": "kms:*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "Allow CloudWatch Logs usage",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "logs.${var.aws_region}.amazonaws.com"
+      },
+      "Action": [
+        "kms:GenerateDataKey*",
+        "kms:Decrypt"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "kms:EncryptionContext:aws:logs:arn": "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:*"
+        }
+      }
+    }
+  ]
+}
+EOF
+
+  tags = {
+    Name = "${var.project_name}-cw-logs-key"
+  }
+}
+
+
 resource "aws_cloudwatch_log_group" "vpc_logs" {
-  name = "/aws/vpc/${var.project_name}-flow-logs"
+  name              = "/aws/vpc/${var.project_name}-flow-logs"
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.cw_logs.arn
+
+  tags = {
+    Name = "${var.project_name}-flow-logs"
+  }
 }
 
 # Desactiva todo tráfico en el Security Group por defecto
