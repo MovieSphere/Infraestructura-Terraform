@@ -5,6 +5,7 @@ module "vpc" {
   public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
   availability_zones   = var.availability_zones
+  flow_logs_role_arn   = module.iam.flow_logs_role_arn
 }
 
 module "security" {
@@ -26,6 +27,7 @@ module "api_gateway" {
   source                = "../../modules/api_gateway"
   project_name          = var.project_name
   integration_uri       = module.alb.alb_dns_name
+  kms_key_arn           = module.iam.kms_key_id
 }
 
 module "rds" {
@@ -36,6 +38,7 @@ module "rds" {
   db_instance_class     = var.db_instance_class
   rds_sg_id             = module.security.rds_sg_id
   db_subnet_group_name  = module.vpc.db_subnet_group_name
+  monitoring_role_arn   = module.iam.rds_monitoring_role_arn
 }
 
 module "iam" {
@@ -74,10 +77,13 @@ module "s3" {
   project_name  = var.project_name
   environment   = var.environment
   bucket_suffix = var.bucket_suffix
+  bucket_name   = "${var.project_name}-${var.environment}-${var.bucket_suffix}"
+  kms_key_id    = module.iam.kms_key_id
 }
 
 module "cloudfront" {
   source         = "../../modules/cloudfront"
+  project_name   = var.project_name
   bucket_arn     = module.s3.bucket_arn
   bucket_name    = module.s3.bucket_name
   bucket_domain  = module.s3.bucket_domain
