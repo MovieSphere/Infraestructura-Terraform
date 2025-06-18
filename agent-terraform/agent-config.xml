@@ -1,0 +1,37 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<slave>
+  <name>terraform-agent</name>
+  <description>Jenkins agent for Terraform operations</description>
+  <remoteFS>/home/jenkins/workspace</remoteFS>
+  <numExecutors>2</numExecutors>
+  <mode>NORMAL</mode>
+  <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+  <launcher class="hudson.slaves.JNLPLauncher">
+    <workDirSettings>
+      <disabled>false</disabled>
+      <internalDir>remoting</internalDir>
+      <failIfWorkDirIsMissing>false</failIfWorkDirIsMissing>
+    </workDirSettings>
+  </launcher>
+  <label>terraform docker</label>
+  <nodeProperties>
+    <hudson.slaves.EnvironmentVariablesNodeProperty>
+      <envVars serialization="custom">
+        <unserializable-parents/>
+        <tree-map>
+          <default>
+            <comparator class="hudson.util.CaseInsensitiveComparator"/>
+          </default>
+          <int>3</int>
+          <string>AWS_DEFAULT_REGION</string>
+          <string>us-east-1</string>
+          <string>JAVA_HOME</string>
+          <string>/usr/lib/jvm/java-11-openjdk-amd64</string>
+          <string>PATH</string>
+          <string>/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/jvm/java-11-openjdk-amd64/bin</string>
+        </tree-map>
+      </envVars>
+    </hudson.slaves.EnvironmentVariablesNodeProperty>
+  </nodeProperties>
+  <userId>jenkins</userId>
+</slave> 

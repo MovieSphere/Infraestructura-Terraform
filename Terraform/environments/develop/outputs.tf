@@ -5,7 +5,7 @@ output "alb_dns_name" {
 
 output "cloudwatch_dashboard_name" {
   value = module.cloudwatch.dashboard_name
-  }
+}
 
 output "media_bucket_name" {
   value = module.media.media_bucket_name
