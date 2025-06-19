@@ -177,7 +177,7 @@ resource "aws_security_group_rule" "alb_egress_to_ec2" {
   to_port                        = 3000
   protocol                       = "tcp"
   security_group_id              = aws_security_group.alb_sg.id
-  destination_security_group_id  = aws_security_group.ec2_sg.id
+  source_security_group_id      = aws_security_group.ec2_sg.id
 }
 
 # API GW → ALB (egress)
@@ -187,5 +187,5 @@ resource "aws_security_group_rule" "apigw_egress_to_alb" {
   to_port                        = 80
   protocol                       = "tcp"
   security_group_id              = aws_security_group.apigw_sg.id
-  destination_security_group_id  = aws_security_group.alb_sg.id
+  source_security_group_id      = aws_security_group.alb_sg.id
 }

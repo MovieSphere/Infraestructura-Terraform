@@ -10,7 +10,7 @@ output "alb_dns_name" {
 
 output "alb_https_listener_arn" {
   description = "ARN del listener HTTPS"
-  value       = aws_lb_listener.https_listener.arn
+  value       = aws_lb_listener.https_listener[*].arn
 }
 
 output "target_group_auth_arn" {
