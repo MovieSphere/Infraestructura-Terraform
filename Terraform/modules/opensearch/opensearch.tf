@@ -10,17 +10,10 @@ resource "aws_opensearch_domain" "moviesphere" {
     volume_size = 10
     volume_type = "gp2"
   }
-  access_policies = <<POLICIES
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": "*",
-      "Action": "es:*",
-      "Resource": "arn:aws:es:${var.region}:*:domain/moviesphere/*"
-    }
-  ]
-}
-POLICIES
+  access_policies = var.opensearch_access_policies
+
+  tags = {
+    Name        = "${var.project_name}-os-domain"
+    Environment = var.environment
+  }
 }

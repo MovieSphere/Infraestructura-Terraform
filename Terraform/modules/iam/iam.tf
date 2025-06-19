@@ -91,3 +91,20 @@ resource "aws_iam_role_policy_attachment" "vpc_flow_logs_attach" {
   role       = aws_iam_role.vpc_flow_logs_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
 }
+
+resource "aws_iam_policy" "opensearch_access_policy" {
+  name        = "${var.project_name}-opensearch-access-policy"
+  description = "Política de acceso para OpenSearch del proyecto ${var.project_name}"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = "*",
+        Action   = "es:*",
+        Resource = "arn:aws:es:us-east-1:512248046326:domain/moviesphere/*"
+      }
+    ]
+  })
+}
