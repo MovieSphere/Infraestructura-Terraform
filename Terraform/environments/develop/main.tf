@@ -116,18 +116,31 @@ module "cloudfront" {
 }
 
 module "opensearch" {
-  source           = "../../modules/opensearch"
-  project_name     = var.project_name
-  region           = var.region
-  domain_name      = var.project_name
-  engine_version   = var.opensearch_engine_version
-  instance_type    = var.opensearch_instance_type
-  instance_count   = var.opensearch_instance_count
-  vpc_id           = module.vpc.vpc_id
-  subnet_ids       = module.vpc.private_subnet_ids
-  security_group_ids = [module.security.ec2_sg_id]
-  ebs_enabled      = true
-  ebs_volume_size  = 20
-  ebs_volume_type  = "gp2"
+  source = "../../modules/opensearch"
+
+  region = var.region
+
+  domain_name    = var.project_name       # nombre de dominio OpenSearch
+  engine_version = var.engine_version     # e.g. "OpenSearch_2.11"
+  instance_type  = var.instance_type      # e.g. "t3.small.search"
+  instance_count = var.instance_count     # e.g. 1
+
+  access_policies = <<POLICIES
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "es:*",
+      "Resource": "arn:aws:es:${var.region}:*:/domain/${var.project_name}/*"
+    }
+  ]
+}
+POLICIES
+
+  tags = {
+    Name = "${var.project_name}-os-domain"
+  }
 }
 
