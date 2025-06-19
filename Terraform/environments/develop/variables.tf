@@ -139,3 +139,26 @@ variable "monitoring_role_arn" {
   type        = string
 }
 
+variable "opensearch_engine_version" {
+  description = "Versión de OpenSearch"
+  type        = string
+  default     = "OpenSearch_2.11"
+}
+
+variable "opensearch_instance_type" {
+  description = "Tipo de instancia para nodos de OpenSearch"
+  type        = string
+  default     = "t3.small.search"
+}
+
+variable "opensearch_instance_count" {
+  description = "Número de instancias en el clúster de OpenSearch"
+  type        = number
+  default     = 1
+}
+
+variable "opensearch_access_policies" {
+  description = "Política IAM en JSON para el dominio de OpenSearch"
+  type        = string
+}
+

@@ -117,30 +117,15 @@ module "cloudfront" {
 
 module "opensearch" {
   source = "../../modules/opensearch"
-
   region = var.region
-
-  domain_name    = var.project_name       # nombre de dominio OpenSearch
-  engine_version = var.engine_version     # e.g. "OpenSearch_2.11"
-  instance_type  = var.instance_type      # e.g. "t3.small.search"
-  instance_count = var.instance_count     # e.g. 1
-
-  access_policies = <<POLICIES
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": "*",
-      "Action": "es:*",
-      "Resource": "arn:aws:es:${var.region}:*:/domain/${var.project_name}/*"
-    }
-  ]
-}
-POLICIES
+  domain_name    = var.project_name
+  engine_version = var.opensearch_engine_version
+  instance_type  = var.opensearch_instance_type
+  instance_count = var.opensearch_instance_count
+  access_policies = var.opensearch_access_policies
 
   tags = {
-    Name = "${var.project_name}-os-domain"
+    Name        = "${var.project_name}-os-domain"
+    Environment = var.environment
   }
 }
-
