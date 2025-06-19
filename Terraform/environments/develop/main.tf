@@ -114,3 +114,20 @@ module "cloudfront" {
   cf_price_class  = var.cf_price_class
   log_bucket_name = module.s3.bucket_name
 }
+
+module "opensearch" {
+  source           = "../../modules/opensearch"
+  project_name     = var.project_name
+  region           = var.region
+  domain_name      = var.project_name
+  engine_version   = var.opensearch_engine_version
+  instance_type    = var.opensearch_instance_type
+  instance_count   = var.opensearch_instance_count
+  vpc_id           = module.vpc.vpc_id
+  subnet_ids       = module.vpc.private_subnet_ids
+  security_group_ids = [module.security.ec2_sg_id]
+  ebs_enabled      = true
+  ebs_volume_size  = 20
+  ebs_volume_type  = "gp2"
+}
+

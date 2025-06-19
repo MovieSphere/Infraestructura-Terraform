@@ -138,3 +138,4 @@ variable "monitoring_role_arn" {
   description = "ARN del rol de IAM usado para monitoreo de RDS (o CloudWatch)"
   type        = string
 }
+
