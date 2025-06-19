@@ -28,7 +28,7 @@ module "api_gateway" {
   source          = "../../modules/api_gateway"
   project_name    = var.project_name
   integration_uri = module.alb.alb_dns_name
-  kms_key_arn     = var.kms_key_id
+  kms_key_arn     = module.kms.kms_key_arn
 }
 
 module "rds" {
@@ -95,7 +95,7 @@ module "s3" {
   environment   = var.environment
   bucket_suffix = var.bucket_suffix
   bucket_name   = "${var.project_name}-${var.environment}"
-  kms_key_id    = var.kms_key_id
+  kms_key_id    = module.kms.kms_key_arn
 }
 
 module "media" {
@@ -117,15 +117,29 @@ module "cloudfront" {
 
 module "opensearch" {
   source = "../../modules/opensearch"
+  project_name = var.project_name
+  environment = var.environment
+  opensearch_access_policies = module.iam.opensearch_access_policy_json
   region = var.region
   domain_name    = var.project_name
   engine_version = var.opensearch_engine_version
   instance_type  = var.opensearch_instance_type
   instance_count = var.opensearch_instance_count
-  access_policies = var.opensearch_access_policies
-
-  tags = {
-    Name        = "${var.project_name}-os-domain"
-    Environment = var.environment
-  }
 }
+
+module "kms" {
+  source                  = "../../modules/kms"
+  project_name            = var.project_name
+  environment             = var.environment
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+}
+
+module "acm" {
+  source      = "../../modules/acm"
+  project_name = var.project_name
+  environment  = var.environment
+  domain_name = var.domain_name
+  zone_id     = var.zone_id
+}
+

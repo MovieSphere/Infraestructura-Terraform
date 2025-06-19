@@ -157,8 +157,12 @@ variable "opensearch_instance_count" {
   default     = 1
 }
 
-variable "opensearch_access_policies" {
-  description = "Política IAM en JSON para el dominio de OpenSearch"
-  type        = string
+variable "domain_name"{
+  description = "Nombre del dominio"
+  default = ""
 }
 
+variable "zone_id" {
+  description = "Zona del dominio"
+  default = ""
+}

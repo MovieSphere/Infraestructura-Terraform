@@ -45,14 +45,23 @@ variable "ebs_volume_type" {
   default     = "gp2"
 }
 
-variable "access_policies" {
-  description = "JSON-formatted IAM policy document for OpenSearch access"
-  type        = string
-}
-
 variable "tags" {
   description = "Tags to apply to the OpenSearch domain"
   type        = map(string)
   default     = {}
 }
 
+variable "opensearch_access_policies" {
+  description = "Políticas de acceso para OpenSearch"
+  type        = string
+}
+
+variable "project_name" {
+  description = "Nombre del proyecto"
+  type        = string
+}
+
+variable "environment" {
+  description = "Environment"
+  type        = string
+}

@@ -11,3 +11,7 @@ output "flow_logs_role_arn" {
 output "vpc_flow_logs_role_arn" {
   value = aws_iam_role.vpc_flow_logs_role.arn
 }
+output "opensearch_access_policy_json" {
+  description = "JSON de la política de acceso para OpenSearch"
+  value       = aws_iam_policy.opensearch_access_policy.policy
+}
