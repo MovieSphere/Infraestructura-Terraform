@@ -65,3 +65,28 @@ variable "environment" {
   description = "Environment"
   type        = string
 }
+
+variable "vpc_subnet_ids" {
+  description = "Subnets privadas para OpenSearch en VPC"
+  type        = list(string)
+}
+
+variable "security_group_ids" {
+  description = "Security Groups para OpenSearch en VPC"
+  type        = list(string)
+}
+
+variable "audit_log_group_arn" {
+  description = "ARN de CloudWatch Log Group para audit logs de OpenSearch"
+  type        = string
+}
+
+variable "index_slow_log_group_arn" {
+  description = "ARN de Log Group para index slow logs"
+  type        = string
+}
+
+variable "search_slow_log_group_arn" {
+  description = "ARN de Log Group para search slow logs"
+  type        = string
+}

@@ -15,6 +15,7 @@ resource "aws_docdb_cluster" "this" {
   storage_encrypted       = true                   # CKV_AWS_74: cifrado en descanso
   kms_key_id              = var.docdb_kms_key_id   # CKV_AWS_182: usar CMK de cliente
   backup_retention_period = var.backup_retention_period  # CKV_AWS_360: retención adecuada
+  enabled_cloudwatch_logs_exports = var.docdb_enabled_logs_exports
 }
 
 resource "aws_docdb_cluster_instance" "this" {

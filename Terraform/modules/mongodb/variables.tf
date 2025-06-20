@@ -48,3 +48,9 @@ variable "backup_retention_period" {
   default     = 7     # mínimo 1–7 días, ajusta según tu política interna
 }
 
+variable "docdb_enabled_logs_exports" {
+  description = "Tipos de logs de DocumentDB a exportar a CloudWatch (e.g. audit, profiler)"
+  type        = list(string)
+  default     = ["profiler","audit"]
+}
+
