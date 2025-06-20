@@ -20,43 +20,42 @@ resource "aws_s3_bucket_lifecycle_configuration" "frontend" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "frontend_logs" {
-  bucket = aws_s3_bucket.frontend_logs.id
+  bucket = aws_s3_bucket.frontend_logs.id   # ID del bucket de logs
 
   rule {
     id     = "expire-logs"
     status = "Enabled"
 
-    filter {
-      prefix = ""
-    }
+    # Filtro opcional: sustituye "" por "logs/" si usas un prefijo
+    filter { prefix = "" }
 
-    expiration {
-      days = 30
-    }
-
+    # ❗ Abortar multipart uploads incompletos a los 7 días
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
+
+    # Borrar objetos de log tras 30 días
+    expiration { days = 30 }
   }
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "frontend_replica" {
-  bucket = aws_s3_bucket.frontend_replica.id
+  bucket = aws_s3_bucket.frontend_replica.id   # ID del bucket réplica
 
   rule {
     id     = "expire-replica"
     status = "Enabled"
 
-    filter {
-      prefix = ""
-    }
+    # Sin prefijo; ajusta si usas carpetas virtuales
+    filter { prefix = "" }
 
-    expiration {
-      days = 30
-    }
-
+    # ❗ Abortar multipart uploads incompletos a los 7 días
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
+
+    # Borrar objetos de réplica tras 30 días
+    expiration { days = 30 }
   }
 }
+
