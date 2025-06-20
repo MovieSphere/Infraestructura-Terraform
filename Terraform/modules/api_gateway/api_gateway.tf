@@ -5,7 +5,8 @@ resource "aws_apigatewayv2_api" "http_api" {
 
 resource "aws_cloudwatch_log_group" "api_gw_access" {
   name              = "/${var.project_name}/api-gw"
-  retention_in_days = 14
+  retention_in_days = 365      # Retiene logs al menos 1 año para cumplir CKV_AWS_338
+  kms_key_id        = var.kms_key_id != "" ? var.kms_key_id : null
 }
 
 resource "aws_apigatewayv2_stage" "default" {

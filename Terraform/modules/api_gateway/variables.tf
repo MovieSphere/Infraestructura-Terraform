@@ -56,3 +56,9 @@ variable "acm_certificate_arn" {
   type        = string
   default     = ""   
 }
+
+variable "kms_key_id" {
+  description = "ARN de la clave KMS para encriptar los grupos de logs de API Gateway"
+  type        = string
+  default     = ""     # o quítalo si quieres hacerlo obligatorio
+}

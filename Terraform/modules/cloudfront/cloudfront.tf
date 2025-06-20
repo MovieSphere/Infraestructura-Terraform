@@ -47,6 +47,23 @@ resource "aws_cloudfront_distribution" "cdn" {
     origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
   }
 
+  # Origin failover group
+  origin_group {
+    origin_id = "failover-group"
+
+    # Aquí defines cuándo hacer el failover
+    failover_criteria {
+      status_codes = [403, 404, 500, 502, 503, 504]
+    }
+
+    member {
+      origin_id = "primary-origin"
+    }
+    member {
+      origin_id = "failover-origin"
+    }
+  }
+
   dynamic "origin" {
     for_each = var.failover_bucket_domain != "" ? [1] : []
     content {
@@ -108,8 +125,8 @@ resource "aws_cloudfront_distribution" "cdn" {
 
   restrictions {
     geo_restriction {
-      restriction_type = "none"
-      locations       = ["US", "CA", "MX", "BR", "AR", "CL", "CO", "PE", "VE", "EC", "BO", "PY", "UY", "GY", "SR", "GF", "FK"]
+      restriction_type = "whitelist"
+      locations        = var.geo_restriction_locations
     }
   }
 

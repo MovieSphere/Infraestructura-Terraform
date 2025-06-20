@@ -1,5 +1,6 @@
 resource "aws_sns_topic" "alerts_topic" {
   name = "${var.project_name}-alerts"
+  kms_master_key_id = var.sns_kms_key_id != "" ? var.sns_kms_key_id : null
 }
 
 resource "aws_sns_topic_subscription" "email_subscription" {
@@ -10,7 +11,8 @@ resource "aws_sns_topic_subscription" "email_subscription" {
 
 resource "aws_cloudwatch_log_group" "app_logs" {
   name              = var.log_group_name
-  retention_in_days = 14
+  retention_in_days = var.log_retention_in_days
+  kms_key_id        = var.log_kms_key_id != "" ? var.log_kms_key_id : null
 }
 
 # Metric Filter para contar cada línea que contenga "ERROR"

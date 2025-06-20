@@ -91,3 +91,10 @@ variable "minimum_protocol_version" {
     error_message = "minimum_protocol_version debe ser una versión válida de TLS."
   }
 }
+
+variable "geo_restriction_locations" {
+  description = "Lista de códigos de pais permitidos en CloudFront"
+  type        = list(string)
+  default     = ["US","CA","MX","BR","AR","CL","CO","PE","VE","EC","BO","PY","UY","GY","SR","GF","FK"]
+}
+
