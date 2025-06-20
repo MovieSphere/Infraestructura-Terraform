@@ -148,6 +148,7 @@ module "opensearch" {
   # VPC
   vpc_subnet_ids        = module.vpc.private_subnet_ids      # subredes privadas
   security_group_ids    = [module.security.ec2_sg_id]        # SGs adecuados
+  vpc_id                = module.vpc.vpc_id
 
   # Logging (ARNs de CloudWatch Log Groups)
   audit_log_group_arn        = aws_cloudwatch_log_group.os_audit.arn
