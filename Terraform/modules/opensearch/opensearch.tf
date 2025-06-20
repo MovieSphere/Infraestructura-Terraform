@@ -2,6 +2,7 @@
 resource "aws_kms_key" "opensearch_kms" {
   description             = "KMS key for OpenSearch encryption"
   deletion_window_in_days = 7
+  enable_key_rotation     = true  # Habilitar rotación de clave
 }
 
 # Security Group personalizado para OpenSearch (CKV_AWS_248)
@@ -15,6 +16,7 @@ resource "aws_security_group" "opensearch_sg" {
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = var.allowed_cidr_blocks  # Ejemplo: ["10.0.0.0/16"]
+    description = "Allow HTTPS traffic from internal subnets"
   }
 
   egress {
@@ -22,6 +24,7 @@ resource "aws_security_group" "opensearch_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow HTTPS egress to internal networks"
   }
 
   tags = {
@@ -36,8 +39,8 @@ resource "aws_opensearch_domain" "moviesphere" {
 
   # Configuración de clúster para alta disponibilidad (CKV_AWS_318)
   cluster_config {
-    instance_type           = "t3.small.search"
-    instance_count          = 3  # Mínimo 3 nodos para HA [[8]]
+    instance_type            = "t3.small.search"
+    instance_count           = 3  # Mínimo 3 nodos para HA [[9]]
     dedicated_master_enabled = true  # Nodos maestros dedicados
     zone_awareness_enabled   = true  # Distribución en múltiples zonas de disponibilidad [[8]]
   }
@@ -79,6 +82,18 @@ resource "aws_opensearch_domain" "moviesphere" {
   domain_endpoint_options {
     enforce_https = true
     tls_security_policy = "Policy-Min-TLS-1-2-2019-07"  # TLS 1.2 mínimo [[3]]
+  }
+
+  node_to_node_encryption {
+    enabled = true  # Enable end-to-end encryption between nodes [[1]][[9]]
+  }
+
+  advanced_security_options {
+    enabled = true  # CKV2_AWS_52 fix [[6]][[10]]
+    internal_user_database_enabled = true
+    master_user_options {
+      master_user_arn = var.opensearch_master_user_arn
+    }
   }
 
   access_policies = var.opensearch_access_policies

@@ -133,3 +133,8 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "opensearch_master_user_arn" {
+  description = "ARN of the master user/role for OpenSearch FGAC"
+  type        = string
+}
