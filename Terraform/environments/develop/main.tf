@@ -154,7 +154,7 @@ module "opensearch" {
   audit_log_group_arn        = aws_cloudwatch_log_group.os_audit.arn
   index_slow_log_group_arn   = aws_cloudwatch_log_group.os_index_slow.arn
   search_slow_log_group_arn  = aws_cloudwatch_log_group.os_search_slow.arn
-  opensearch_master_user_arn = "arn:aws:iam::123456789012:user/KathiaMR"
+  opensearch_master_user_arn = "arn:aws:iam::512248046326:user/KathiaMR"
 
   tags = {
     Name        = "${var.project_name}-os-domain"

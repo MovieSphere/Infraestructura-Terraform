@@ -32,7 +32,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   is_ipv6_enabled     = true
   comment             = "CDN para ${var.bucket_name}"
   default_root_object = "index.html"
-  web_acl_id = var.waf_web_acl_arn != "" ? var.waf_web_acl_arn : null
+  web_acl_id = aws_wafv2_web_acl.log4j_protection.arn 
   
   logging_config {
     bucket = "${var.log_bucket_name}.s3.amazonaws.com"
@@ -133,4 +133,46 @@ resource "aws_cloudfront_distribution" "cdn" {
   tags = {
     Name = "${var.project_name}-cloudfront"
   }
+}
+
+resource "aws_wafv2_web_acl" "log4j_protection" {
+  name        = "log4j-protect-acl"
+  description = "Protección contra vulnerabilidad Log4j (CVE-2021-44228)"
+  scope       = "CLOUDFRONT"
+  default_action {
+    allow {}
+  }
+
+  rule {
+    name     = "AWSManagedRulesLog4jRuleSet"
+    priority = 1
+    override_action {
+      none {}
+    }
+    rule_label {
+      name = "Log4jRule"
+    }
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesLog4jRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "log4j_protection"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                 = "log4j_protection"
+    sampled_requests_enabled    = true
+  }
+}
+
+resource "aws_wafv2_web_acl_association" "cloudfront_waf" {
+  web_acl_arn = aws_wafv2_web_acl.log4j_protection.arn
+  resource_arn = aws_cloudfront_distribution.cdn.arn
 }
