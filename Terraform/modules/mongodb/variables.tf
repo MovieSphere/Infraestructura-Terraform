@@ -36,3 +36,15 @@ variable "instance_count" {
   type        = number
   default     = 1
 }
+
+variable "docdb_kms_key_id" {
+  description = "ARN de la CMK para cifrar el clúster DocumentDB"
+  type        = string
+}
+
+variable "backup_retention_period" {
+  description = "Número de días para retención de backups de DocumentDB"
+  type        = number
+  default     = 7     # mínimo 1–7 días, ajusta según tu política interna
+}
+
