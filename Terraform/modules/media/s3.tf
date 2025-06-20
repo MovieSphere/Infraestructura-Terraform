@@ -52,7 +52,7 @@ resource "aws_s3_bucket_ownership_controls" "media_logs" {
   bucket = aws_s3_bucket.media_logs.id
 
   rule {
-    object_ownership = "ObjectWriter"
+    object_ownership = "BucketOwnerEnforced"
   }
 }
 

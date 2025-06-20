@@ -98,3 +98,8 @@ variable "geo_restriction_locations" {
   default     = ["US","CA","MX","BR","AR","CL","CO","PE","VE","EC","BO","PY","UY","GY","SR","GF","FK"]
 }
 
+# Agrega esta nueva variable al final del archivo
+variable "waf_log_destination_arn" {
+  description = "ARN del destino de logs para WAF (S3, CloudWatch o Kinesis)"
+  type        = string
+}

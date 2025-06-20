@@ -146,8 +146,8 @@ resource "aws_wafv2_web_acl" "log4j_protection" {
   rule {
     name     = "AWSManagedRulesLog4jRuleSet"
     priority = 1
-    override_action {
-      none {}
+    action {
+      block {}
     }
     rule_label {
       name = "Log4jRule"
@@ -170,6 +170,12 @@ resource "aws_wafv2_web_acl" "log4j_protection" {
     metric_name                 = "log4j_protection"
     sampled_requests_enabled    = true
   }
+}
+
+# Configuración de logging para WAF (requerido por CKV2_AWS_31)
+resource "aws_wafv2_web_acl_logging_configuration" "waf_logging" {
+  log_destination_configs = [var.waf_log_destination_arn]
+  resource_arn            = aws_wafv2_web_acl.log4j_protection.arn
 }
 
 resource "aws_wafv2_web_acl_association" "cloudfront_waf" {
