@@ -171,3 +171,9 @@ variable "zone_id" {
   description = "Zona del dominio"
   default = ""
 }
+
+variable "tls_security_policy" {
+  description = "TLS security policy for domain endpoint, e.g., 'Policy-Min-TLS-1-2-2019-07'"
+  type        = string
+  default     = "Policy-Min-TLS-1-2-2019-07"
+}

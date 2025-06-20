@@ -45,6 +45,17 @@ variable "ebs_volume_type" {
   default     = "gp2"
 }
 
+variable "kms_key_id" {
+  description = "ARN of the KMS key for encryption at rest"
+  type        = string
+}
+
+variable "tls_security_policy" {
+  description = "TLS security policy for domain endpoint, e.g., 'Policy-Min-TLS-1-2-2019-07'"
+  type        = string
+  default     = "Policy-Min-TLS-1-2-2019-07"
+}
+
 variable "tags" {
   description = "Tags to apply to the OpenSearch domain"
   type        = map(string)
@@ -90,3 +101,4 @@ variable "search_slow_log_group_arn" {
   description = "ARN de Log Group para search slow logs"
   type        = string
 }
+

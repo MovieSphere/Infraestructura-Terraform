@@ -1,3 +1,4 @@
+# Certificado ACM
 resource "aws_acm_certificate" "moviesphere_cert" {
   domain_name       = var.domain_name
   validation_method = "DNS"
@@ -11,18 +12,8 @@ resource "aws_acm_certificate" "moviesphere_cert" {
   }
 }
 
-resource "aws_route53_record" "moviesphere_cert_validation" {
-  for_each = {
-    for dvo in aws_acm_certificate.moviesphere_cert.domain_validation_options : dvo.domain_name => dvo
-  }
-  name    = each.value.resource_record_name
-  type    = each.value.resource_record_type
-  zone_id = var.zone_id
-  records = [each.value.resource_record_value]
-  ttl     = 60
-}
-
+# Validación del certificado (sin gestionar registros DNS manualmente)
 resource "aws_acm_certificate_validation" "moviesphere_cert_validation" {
   certificate_arn         = aws_acm_certificate.moviesphere_cert.arn
-  validation_record_fqdns = [for record in aws_route53_record.moviesphere_cert_validation : record.fqdn]
+  validation_record_fqdns = [for option in aws_acm_certificate.moviesphere_cert.domain_validation_options : option.resource_record_name]
 }
