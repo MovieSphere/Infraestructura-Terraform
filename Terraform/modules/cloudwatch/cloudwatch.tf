@@ -1,3 +1,31 @@
+# Definición de clave KMS (si no existe en otro módulo)
+resource "aws_kms_key" "log_encryption" {
+  description             = "Clave KMS para cifrado de logs de CloudWatch"
+  deletion_window_in_days = 7
+}
+
+# Grupo de logs para auditoría
+resource "aws_cloudwatch_log_group" "os_audit" {
+  name              = "/os/${var.project_name}/audit-logs"
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.log_encryption.arn  # Cifrado con KMS
+}
+
+# Grupo de logs para índices lentos
+resource "aws_cloudwatch_log_group" "os_index_slow" {
+  name              = "/os/${var.project_name}/index-slow-logs"
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.log_encryption.arn
+}
+
+# Grupo de logs para búsquedas lentas
+resource "aws_cloudwatch_log_group" "os_search_slow" {
+  name              = "/os/${var.project_name}/search-slow-logs"
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.log_encryption.arn
+}
+
+# Alarma de CPU
 resource "aws_cloudwatch_metric_alarm" "ec2_cpu" {
   alarm_name          = "${var.project_name}-ec2-cpu-utilization"
   comparison_operator = "GreaterThanThreshold"
@@ -15,6 +43,7 @@ resource "aws_cloudwatch_metric_alarm" "ec2_cpu" {
   }
 }
 
+# Alarma de memoria
 resource "aws_cloudwatch_metric_alarm" "ec2_memory" {
   alarm_name          = "${var.project_name}-ec2-memory-utilization"
   comparison_operator = "GreaterThanThreshold"
@@ -32,6 +61,7 @@ resource "aws_cloudwatch_metric_alarm" "ec2_memory" {
   }
 }
 
+# Dashboard
 resource "aws_cloudwatch_dashboard" "main" {
   dashboard_name = "${var.project_name}-dashboard"
 
