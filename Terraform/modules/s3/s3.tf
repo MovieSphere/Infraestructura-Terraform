@@ -2,8 +2,19 @@ resource "random_id" "bucket_suffix" {
   byte_length = 4
 }
 
+resource "aws_kms_key" "sns" {
+  description             = "KMS key for SNS topic encryption"
+  deletion_window_in_days = 10
+}
+
 resource "aws_sns_topic" "object_created" {
   name = "${var.project_name}-object-created-topic"
+  # Enables server-side encryption at rest
+  kms_master_key_id = aws_kms_key.sns.arn
+  tags = {
+    Environment = var.environment
+    Service     = "s3-object-events"
+  }
 }
 
 resource "aws_sns_topic_policy" "allow_s3_publish" {
@@ -122,6 +133,16 @@ resource "aws_s3_bucket_versioning" "frontend_replica_versioning" {
   }
 }
 
+resource "aws_s3_bucket_versioning" "frontend_logs" {
+  bucket = aws_s3_bucket.frontend_logs.id
+  versioning_configuration { status = "Enabled" }
+}
+
+resource "aws_s3_bucket_versioning" "frontend_replica" {
+  bucket = aws_s3_bucket.frontend_replica.id
+  versioning_configuration { status = "Enabled" }
+}
+
 resource "aws_s3_bucket_website_configuration" "frontend" {
   bucket = aws_s3_bucket.frontend.id
 
@@ -153,6 +174,53 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "frontend" {
   }
 }
 
+resource "aws_kms_key" "logs"    { description = "KMS for frontend_logs" }
+resource "aws_kms_key" "replica" { description = "KMS for frontend_replica" }
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "frontend_logs" {
+  bucket = aws_s3_bucket.frontend_logs.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.logs.arn
+    }
+    bucket_key_enabled = true   # cheaper KMS calls
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "frontend_replica" {
+  bucket = aws_s3_bucket.frontend_replica.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.replica.arn
+    }
+    bucket_key_enabled = true
+  }
+}
+
+resource "aws_s3_bucket_replication_configuration" "logs_to_replica" {
+  bucket = aws_s3_bucket.frontend_logs.id
+  role   = aws_iam_role.s3_replication.arn
+
+  rule {
+    id     = "logs-replication"
+    status = "Enabled"
+
+    # replicate everything
+    filter {}
+
+    destination {
+      bucket        = aws_s3_bucket.frontend_replica.arn
+      storage_class = "STANDARD"
+      #  optional – replicate SSE-KMS objects
+      encryption_configuration {
+        replica_kms_key_id = aws_kms_key.replica.arn
+      }
+    }
+  }
+}
+
 resource "aws_s3_bucket_notification" "frontend" {
   bucket = aws_s3_bucket.frontend.id
 
@@ -163,10 +231,59 @@ resource "aws_s3_bucket_notification" "frontend" {
   }
 }
 
+resource "aws_s3_bucket_notification" "frontend_logs" {
+  bucket = aws_s3_bucket.frontend_logs.id
+
+  topic {
+    topic_arn = aws_sns_topic.object_created.arn
+    events    = ["s3:ObjectCreated:*"]
+  }
+}
+
+resource "aws_s3_bucket_notification" "frontend_replica" {
+  bucket = aws_s3_bucket.frontend_replica.id
+
+  topic {
+    topic_arn = aws_sns_topic.object_created.arn
+    events    = ["s3:ObjectCreated:*"]
+  }
+}
+
 resource "aws_iam_role" "replication_role" {
   name = "${var.project_name}-replication-role"
 
   assume_role_policy = data.aws_iam_policy_document.replication_policy.json
+}
+
+resource "aws_iam_role_policy" "s3_replication" {
+  role   = aws_iam_role.s3_replication.id
+  policy = data.aws_iam_policy_document.s3_replication.json
+}
+
+resource "aws_iam_role" "s3_replication" {
+  name = "${var.project_name}-replication-role"
+  assume_role_policy = jsonencode({
+    Version : "2012-10-17",
+    Statement : [{
+      Effect : "Allow",
+      Principal : { Service : "s3.amazonaws.com" },
+      Action : "sts:AssumeRole"
+    }]
+  })
+}
+
+data "aws_iam_policy_document" "s3_replication" {
+  statement {
+    sid       = "SourceAccess"
+    actions   = ["s3:GetObjectVersion", "s3:GetObjectVersionAcl",
+                 "s3:GetObjectVersionTagging"]
+    resources = ["${aws_s3_bucket.frontend_logs.arn}/*"]
+  }
+  statement {
+    sid       = "DestinationWrite"
+    actions   = ["s3:ReplicateObject", "s3:ReplicateDelete", "s3:ReplicateTags"]
+    resources = ["${aws_s3_bucket.frontend_replica.arn}/*"]
+  }
 }
 
 data "aws_iam_policy_document" "replication_policy" {
