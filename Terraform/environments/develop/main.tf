@@ -120,8 +120,7 @@ module "cloudfront" {
   bucket_name     = module.s3.bucket_name
   bucket_domain   = module.s3.bucket_domain
   cf_price_class  = var.cf_price_class
-  waf_log_destination_arn = "arn:aws:s3:::mi-bucket-waf-logs"
-  log_bucket_name = module.s3.bucket_name
+  cloudfront_web_acl_arn = module.waf.cloudfront_web_acl_arn
 }
 
 resource "aws_cloudwatch_log_group" "os_audit" {

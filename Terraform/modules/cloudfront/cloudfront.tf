@@ -27,31 +27,67 @@ resource "aws_s3_bucket_policy" "frontend_policy" {
   policy = data.aws_iam_policy_document.s3_oai.json
 }
 
+resource "aws_cloudfront_response_headers_policy" "security_headers" {
+  name = "${var.project_name}-security-headers"
+
+  security_headers_config {
+    content_security_policy {
+      content_security_policy = "default-src 'self';"
+      override                = true
+    }
+
+    frame_options {
+      frame_option = "DENY"
+      override     = true
+    }
+
+    referrer_policy {
+      referrer_policy = "no-referrer"
+      override        = true
+    }
+
+    strict_transport_security {
+      access_control_max_age_sec = 63072000
+      include_subdomains         = true
+      preload                    = true
+      override                   = true
+    }
+
+    xss_protection {
+      protection            = true
+      mode_block            = true
+      report_uri            = ""
+      override              = true
+    }
+  }
+}
+
 resource "aws_cloudfront_distribution" "cdn" {
+  #checkov:skip=CKV2_AWS_47:WAF con protección Log4j ya esta definido en otro modulo, el modulo WAF
   enabled             = true
   is_ipv6_enabled     = true
   comment             = "CDN para ${var.bucket_name}"
   default_root_object = "index.html"
-  web_acl_id = aws_wafv2_web_acl.log4j_protection.arn 
-  
-  logging_config {
-    bucket = "${var.log_bucket_name}.s3.amazonaws.com"
-    include_cookies = false
-    prefix  = "cloudfront/"
-  }
+  web_acl_id          = var.cloudfront_web_acl_arn
 
+  # Origen principal
   origin {
-    domain_name = var.bucket_domain
-    origin_id   = "s3-origin"
-
+    domain_name             = var.bucket_domain
+    origin_id               = "primary-origin"
     origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
   }
 
-  # Origin failover group
+  # Origen de respaldo (failover)
+  origin {
+    domain_name             = var.failover_bucket_domain
+    origin_id               = "failover-origin"
+    origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
+  }
+
+  # Grupo de failover
   origin_group {
     origin_id = "failover-group"
 
-    # Aquí defines cuándo hacer el failover
     failover_criteria {
       status_codes = [403, 404, 500, 502, 503, 504]
     }
@@ -59,50 +95,22 @@ resource "aws_cloudfront_distribution" "cdn" {
     member {
       origin_id = "primary-origin"
     }
+
     member {
       origin_id = "failover-origin"
     }
   }
 
-  dynamic "origin" {
-    for_each = var.failover_bucket_domain != "" ? [1] : []
-    content {
-      domain_name = var.failover_bucket_domain
-      origin_id   = "s3-failover-origin"
-
-      origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
-    }
-  }
-
   default_cache_behavior {
+    target_origin_id       = "failover-group"
+    viewer_protocol_policy = "redirect-to-https"
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
-    target_origin_id       = "s3-origin"
-    viewer_protocol_policy = "redirect-to-https"
     compress               = true
 
-    cache_policy_id             = "658327ea-f89d-4fab-a63d-7e88639e58f6" # Managed-CachingOptimized
-    origin_request_policy_id    = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" # Managed-CORS-S3Origin
-    response_headers_policy_id  = "67f7725c-6f97-4210-82d7-5512b31e9d03" # Managed-SecurityHeadersPolicy
-  }
-
-  dynamic "ordered_cache_behavior" {
-    for_each = var.failover_bucket_domain != "" ? [1] : []
-    content {
-      path_pattern     = "/critical/*"
-      allowed_methods  = ["GET", "HEAD"]
-      cached_methods   = ["GET", "HEAD"]
-      target_origin_id = "s3-origin-group"
-
-      cache_policy_id             = "658327ea-f89d-4fab-a63d-7e88639e58f6" # Managed-CachingOptimized
-      origin_request_policy_id    = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" # Managed-CORS-S3Origin
-      response_headers_policy_id  = "67f7725c-6f97-4210-82d7-5512b31e9d03" # Managed-SecurityHeadersPolicy
-
-      viewer_protocol_policy = "redirect-to-https"
-      min_ttl                = 0
-      default_ttl            = 86400
-      max_ttl                = 31536000
-    }
+    cache_policy_id            = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
+    origin_request_policy_id   = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" # CORS-S3Origin
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.security_headers.id # SecurityHeaders
   }
 
   price_class = var.cf_price_class
@@ -117,10 +125,10 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
-    minimum_protocol_version       = "TLSv1.2_2021"
-    acm_certificate_arn           = var.enable_custom_ssl ? var.acm_certificate_arn : null
-    ssl_support_method            = var.ssl_support_method
+    cloudfront_default_certificate = !var.enable_custom_ssl
+    acm_certificate_arn            = var.enable_custom_ssl ? var.acm_certificate_arn : null
+    ssl_support_method             = var.ssl_support_method
+    minimum_protocol_version       = var.minimum_protocol_version
   }
 
   restrictions {
@@ -133,106 +141,4 @@ resource "aws_cloudfront_distribution" "cdn" {
   tags = {
     Name = "${var.project_name}-cloudfront"
   }
-}
-
-resource "aws_wafv2_web_acl" "log4j_protection" {
-  name        = "log4j-protect-acl"
-  description = "Protección completa contra Log4j (CVE-2021-44228)"
-  scope       = "CLOUDFRONT"
-
-  default_action {
-    allow {}
-  }
-
-  # Regla 1: Bloquear patrones "jndi:"
-  rule {
-    name     = "BlockJNDI"
-    priority = 1
-    action {
-      block {}
-    }
-
-    statement {
-      byte_match_statement {
-        search_string = "jndi:"
-
-        field_to_match {
-          body {}
-        }
-
-        positional_constraint = "CONTAINS"
-        text_transformation {
-          priority = 0
-          type     = "LOWERCASE"
-        }
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "block_jndi"
-      sampled_requests_enabled   = true
-    }
-  }
-
-  # Regla 2: Grupo administrado para inputs maliciosos conocidos
-  rule {
-    name     = "AWSManagedRulesKnownBadInputs"
-    priority = 2
-    override_action {
-      none {}
-    }
-
-    statement {
-      managed_rule_group_statement {
-        name        = "AWSManagedRulesKnownBadInputsRuleSet"
-        vendor_name = "AWS"
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "aws_known_bad_inputs"
-      sampled_requests_enabled   = true
-    }
-  }
-
-  # Regla 3: Log4jRuleSet de AWS si lo deseas mantener
-  rule {
-    name     = "AWSManagedRulesLog4j"
-    priority = 3
-    override_action {
-      none {}
-    }
-
-    statement {
-      managed_rule_group_statement {
-        name        = "AWSManagedRulesLog4jRuleSet"
-        vendor_name = "AWS"
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "aws_log4j"
-      sampled_requests_enabled   = true
-    }
-  }
-
-  visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "log4j_protection"
-    sampled_requests_enabled   = true
-  }
-}
-
-# Configuración de logging para WAF (requerido por CKV2_AWS_31)
-resource "aws_wafv2_web_acl_logging_configuration" "waf_logging" {
-  log_destination_configs = [var.waf_log_destination_arn]
-  resource_arn            = aws_wafv2_web_acl.log4j_protection.arn
-}
-
-resource "aws_wafv2_web_acl_association" "cloudfront_waf" {
-  web_acl_arn = aws_wafv2_web_acl.log4j_protection.arn
-  resource_arn = aws_cloudfront_distribution.cdn.arn
 }

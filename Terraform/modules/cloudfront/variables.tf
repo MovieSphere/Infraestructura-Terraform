@@ -23,18 +23,6 @@ variable "cf_price_class" {
   type        = string
 }
 
-variable "log_bucket_name" {
-  description = "Bucket donde se almacenan los logs de CloudFront"
-  type        = string
-}
-
-# Variables para WAF y seguridad
-variable "waf_web_acl_arn" {
-  description = "ARN del WAF Web ACL para CloudFront"
-  type        = string
-  default     = ""
-}
-
 variable "enable_access_logs" {
   description = "Habilitar logs de acceso en CloudFront"
   type        = bool
@@ -98,8 +86,7 @@ variable "geo_restriction_locations" {
   default     = ["US","CA","MX","BR","AR","CL","CO","PE","VE","EC","BO","PY","UY","GY","SR","GF","FK"]
 }
 
-# Agrega esta nueva variable al final del archivo
-variable "waf_log_destination_arn" {
+variable "cloudfront_web_acl_arn" {
   description = "ARN del destino de logs para WAF (S3, CloudWatch o Kinesis)"
   type        = string
 }
