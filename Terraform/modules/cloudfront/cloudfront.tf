@@ -137,38 +137,92 @@ resource "aws_cloudfront_distribution" "cdn" {
 
 resource "aws_wafv2_web_acl" "log4j_protection" {
   name        = "log4j-protect-acl"
-  description = "Protección contra vulnerabilidad Log4j (CVE-2021-44228)"
+  description = "Protección completa contra Log4j (CVE-2021-44228)"
   scope       = "CLOUDFRONT"
+
   default_action {
     allow {}
   }
 
+  # Regla 1: Bloquear patrones "jndi:"
   rule {
-    name     = "AWSManagedRulesLog4jRuleSet"
+    name     = "BlockJNDI"
     priority = 1
     action {
       block {}
     }
-    rule_label {
-      name = "Log4jRule"
+
+    statement {
+      byte_match_statement {
+        search_string = "jndi:"
+
+        field_to_match {
+          body {}
+        }
+
+        positional_constraint = "CONTAINS"
+        text_transformation {
+          priority = 0
+          type     = "LOWERCASE"
+        }
+      }
     }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "block_jndi"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  # Regla 2: Grupo administrado para inputs maliciosos conocidos
+  rule {
+    name     = "AWSManagedRulesKnownBadInputs"
+    priority = 2
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "aws_known_bad_inputs"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  # Regla 3: Log4jRuleSet de AWS si lo deseas mantener
+  rule {
+    name     = "AWSManagedRulesLog4j"
+    priority = 3
+    override_action {
+      none {}
+    }
+
     statement {
       managed_rule_group_statement {
         name        = "AWSManagedRulesLog4jRuleSet"
         vendor_name = "AWS"
       }
     }
+
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "log4j_protection"
+      metric_name                = "aws_log4j"
       sampled_requests_enabled   = true
     }
   }
 
   visibility_config {
     cloudwatch_metrics_enabled = true
-    metric_name                 = "log4j_protection"
-    sampled_requests_enabled    = true
+    metric_name                = "log4j_protection"
+    sampled_requests_enabled   = true
   }
 }
 
