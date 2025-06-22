@@ -73,10 +73,19 @@ module "alb" {
   acm_certificate_arn = "arn:aws:acm:us-east-1:000000000000:certificate/mock-certificate"
   source              = "../../modules/elb"
   project_name        = var.project_name
+  alb_waf_arn         = module.waf.web_acl_arn
   alb_sg_id           = module.security.alb_sg_id
   vpc_id              = module.vpc.vpc_id
   public_subnet_ids   = module.vpc.public_subnet_ids
   instance_ids        = [module.ec2.instance_id]
+}
+
+module "waf" {
+  source              = "../../modules/waf"
+  environment         = var.environment
+  project_name        = var.project_name
+  enable_waf_logging  = false //Por ahora, para pruebas
+  waf_logs_bucket_arn = "arn:aws:s3:::mi-bucket-waf-logs" //Colocar aqui el arn del bucket para logs de waf
 }
 
 module "logs" {

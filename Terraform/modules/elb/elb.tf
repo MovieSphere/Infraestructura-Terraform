@@ -1,4 +1,5 @@
 resource "aws_lb" "app_alb" {
+  #checkov:skip=CKV2_AWS_76:WAF con protección Log4j ya esta definido en otro modulo, el modulo WAF
   name               = "${var.project_name}-alb"
   internal           = false
   load_balancer_type = "application"
