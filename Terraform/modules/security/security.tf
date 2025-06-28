@@ -4,12 +4,12 @@
 
 resource "aws_security_group" "ec2_sg" {
   name        = "${var.project_name}-ec2-sg"
-  description = "Permite solo tráfico de aplicación y DNS"
+  description = "Allows app and DNS traffic"
   vpc_id      = var.vpc_id
 
   # Salida: HTTP
   egress {
-    description = "Salida HTTP"
+    description = "HTTP outbound"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -18,7 +18,7 @@ resource "aws_security_group" "ec2_sg" {
 
   # Salida: HTTPS
   egress {
-    description = "Salida HTTPS"
+    description = "HTTPS outbound"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
@@ -27,7 +27,7 @@ resource "aws_security_group" "ec2_sg" {
 
   # Salida: DNS UDP
   egress {
-    description = "Salida DNS UDP"
+     description = "DNS UDP outbound"
     from_port   = 53
     to_port     = 53
     protocol    = "udp"
@@ -51,12 +51,12 @@ resource "aws_security_group" "ec2_sg" {
 # checkov:skip=CKV2_AWS_5: SG adjunto al clúster RDS en otro módulo
 resource "aws_security_group" "rds_sg" {
   name        = "${var.project_name}-rds-sg"
-  description = "Permite PostgreSQL desde EC2 y restringe salida al VPC"
+  description = "Allows PostgreSQL from EC2 and restricts egress to VPC"
   vpc_id      = var.vpc_id
 
   # Ingreso: PostgreSQL solo desde EC2
   ingress {
-    description     = "PostgreSQL inbound desde EC2"
+    description     = "PostgreSQL inbound from EC2"
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
@@ -65,7 +65,7 @@ resource "aws_security_group" "rds_sg" {
 
   # Salida: restringida al VPC
   egress {
-    description = "Salida restringida al VPC"
+    description = "Egress restricted to VPC"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -79,12 +79,12 @@ resource "aws_security_group" "rds_sg" {
 
 resource "aws_security_group" "ssh_sg" { # checkov:skip=CKV2_AWS_5: SG para SSH, adjunto en módulo Ansible/EC2
   name        = "${var.project_name}-ssh-sg"
-  description = "Permite SSH desde tu IP y salida web/DNS"
+  description = "Allows SSH from your IP and web/DNS egress"
   vpc_id      = var.vpc_id
 
   # Ingreso: SSH desde IP autorizada
   ingress {
-    description = "SSH inbound desde IP del usuario"
+    description = "SSH inbound from user IP"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -93,28 +93,28 @@ resource "aws_security_group" "ssh_sg" { # checkov:skip=CKV2_AWS_5: SG para SSH,
 
   # Salidas necesarias: HTTP, HTTPS, DNS UDP/TCP
   egress {
-    description = "Salida HTTP"
+    description = "HTTP outbound"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
-    description = "Salida HTTPS"
+     description = "HTTPS outbound"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
-    description = "Salida DNS UDP"
+    description = "DNS UDP outbound"
     from_port   = 53
     to_port     = 53
     protocol    = "udp"
     cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
-    description = "Salida DNS TCP"
+    description = "DNS TCP outbound"
     from_port   = 53
     to_port     = 53
     protocol    = "tcp"
@@ -129,7 +129,7 @@ resource "aws_security_group" "ssh_sg" { # checkov:skip=CKV2_AWS_5: SG para SSH,
 # checkov:skip=CKV2_AWS_5: SG para ALB, asociado en módulo ALB
 resource "aws_security_group" "alb_sg" {
   name        = "${var.project_name}-alb-sg"
-  description = "Permite HTTP desde API Gateway y salida a EC2"
+  description = "Allows HTTP from API Gateway and egress to EC2"
   vpc_id      = var.vpc_id
   
   tags = {
@@ -140,7 +140,7 @@ resource "aws_security_group" "alb_sg" {
 # checkov:skip=CKV2_AWS_5: SG de API GW, asociado en módulo VPC Link/API GW
 resource "aws_security_group" "apigw_sg" {
   name        = "${var.project_name}-apigw-sg"
-  description = "Permite tráfico saliente HTTP a ALB"
+  description = "Allows outbound HTTP to ALB"
   vpc_id      = var.vpc_id
 
   tags = {

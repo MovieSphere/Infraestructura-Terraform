@@ -35,12 +35,12 @@ resource "aws_security_group" "opensearch_sg" {
 # Dominio de OpenSearch con configuración segura
 resource "aws_opensearch_domain" "moviesphere" {
   domain_name           = "moviesphere"
-  engine_version        = "OpenSearch_2.11"  # Compatibilidad con TLS 1.2+ [[2]]
+  engine_version        = "OpenSearch_2.11"
 
   # Configuración de clúster para alta disponibilidad (CKV_AWS_318)
   cluster_config {
     instance_type            = "t3.small.search"
-    instance_count           = 3  # Mínimo 3 nodos para HA [[9]]
+    instance_count           = 4  # Mínimo 3 nodos para HA [[9]]
     dedicated_master_enabled = true  # Nodos maestros dedicados
     zone_awareness_enabled   = true  # Distribución en múltiples zonas de disponibilidad [[8]]
   }
@@ -88,9 +88,10 @@ resource "aws_opensearch_domain" "moviesphere" {
     enabled = true  # Enable end-to-end encryption between nodes [[1]][[9]]
   }
 
-  advanced_security_options {
-    enabled = true  # CKV2_AWS_52 fix [[6]][[10]]
-    internal_user_database_enabled = true
+    advanced_security_options {
+    enabled                        = true
+    internal_user_database_enabled = false
+
     master_user_options {
       master_user_arn = var.opensearch_master_user_arn
     }

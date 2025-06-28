@@ -37,14 +37,29 @@ cd Terraform/environments/develop
 terraform init
 ```
 
-3. Revisar el plan:
+3. Configurar variables requeridas:
+   Edite `Terraform/environments/develop/variables.tf` o proporcione los valores
+   mediante `-var` para `domain_name` y `zone_id`. Ambos deben corresponder a un
+   dominio válido y al ID de la zona hospedada en Route53.
+4. Revisar el plan:
 ```bash
 terraform plan
 ```
-
-4. Aplicar la infraestructura:
+5. Aplicar la infraestructura:
 ```bash
 terraform apply
+```
+
+### Importar recursos existentes
+
+Si ya cuentas con servicios en AWS creados manualmente, impórtalos al estado antes de aplicar cambios. Esto evita recrearlos o destruirlos por error.
+
+```bash
+# Importar un bucket S3 existente
+terraform import module.s3.aws_s3_bucket.frontend nombre-del-bucket
+
+# Importar una instancia RDS existente
+terraform import module.rds.aws_db_instance.auth_db identificador-db
 ```
 
 ## Componentes
@@ -68,6 +83,8 @@ terraform apply
 - Bucket S3 para frontend
 - CloudFront como CDN
 - Políticas de acceso seguras
+- Bucket S3 adicional para logs de WAF (**debe existir previamente** o crearse mediante Terraform)
+
 
 ### CloudWatch
 - Monitoreo de EC2 (CPU)
