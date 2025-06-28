@@ -7,9 +7,30 @@ resource "aws_db_parameter_group" "this" {
   family      = "postgres15"
   description = "Grupo de parámetros para ${var.project_name}"
 
+  # Registro de todas las sentencias SQL
   parameter {
     name  = "log_statement"
-    value = "none"
+    value = "all"
+  }
+
+  # Registro detallado de todas las consultas (duración mínima = 0 ms)
+  parameter {
+    name  = "log_min_duration_statement"
+    value = "0"
+  }
+
+  # Opcionalmente, registra conexiones, desconexiones y esperas de locks
+  parameter {
+    name  = "log_connections"
+    value = "1"
+  }
+  parameter {
+    name  = "log_disconnections"
+    value = "1"
+  }
+  parameter {
+    name  = "log_lock_waits"
+    value = "1"
   }
 }
 
@@ -28,7 +49,7 @@ resource "aws_db_instance" "auth_db" {
   db_subnet_group_name                  = var.db_subnet_group_name
   backup_retention_period               = var.backup_retention_period
   backup_window                         = var.backup_window
-  parameter_group_name                  = local.parameter_group_name
+  parameter_group_name                  = aws_db_parameter_group.this.name
 
   storage_encrypted                     = true                         
   auto_minor_version_upgrade            = true                          
@@ -72,7 +93,7 @@ resource "aws_db_instance" "users_db" {
   db_subnet_group_name                  = var.db_subnet_group_name
   backup_retention_period               = var.backup_retention_period
   backup_window                         = var.backup_window
-  parameter_group_name                  = local.parameter_group_name
+  parameter_group_name                  = aws_db_parameter_group.this.name
 
   storage_encrypted                     = true
   auto_minor_version_upgrade            = true
@@ -115,7 +136,7 @@ resource "aws_db_instance" "catalog_db" {
   publicly_accessible                   = false
   vpc_security_group_ids                = [var.rds_sg_id]
   db_subnet_group_name                  = var.db_subnet_group_name
-
+  parameter_group_name                  = aws_db_parameter_group.this.name
   storage_encrypted                     = true
   auto_minor_version_upgrade            = true
   deletion_protection                   = true
