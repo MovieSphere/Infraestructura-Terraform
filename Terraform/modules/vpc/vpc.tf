@@ -134,42 +134,40 @@ resource "aws_kms_key" "cw_logs" {
   enable_key_rotation     = true
 
   policy = jsonencode({
-  Version = "2012-10-17",
-  Id      = "vpc-flow-logs-key-policy",
-  Statement = [
-    {
-      Sid    = "AllowRootAccount",
-      Effect = "Allow",
-      Principal = {
-        AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+    Version = "2012-10-17",
+    Id      = "vpc-flow-logs-key-policy",
+    Statement = [
+      {
+        Sid    = "AllowRootAccount",
+        Effect = "Allow",
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        Action   = "kms:*",
+        Resource = "*"
       },
-      Action   = "kms:*",
-      Resource = "*"
-    },
-    {
-      Sid    = "AllowCloudWatchLogsUse",
-      Effect = "Allow",
-      Principal = {
-        Service = "logs.${var.aws_region}.amazonaws.com"
-      },
-      Action = [
-        "kms:Encrypt",
-        "kms:Decrypt",
-        "kms:ReEncrypt*",
-        "kms:GenerateDataKey*",
-        "kms:DescribeKey"
-      ],
-      Resource = "*",
-      Condition = {
-        ArnLike = {
-          "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:*"
+      {
+        Sid    = "AllowCloudWatchLogsUse",
+        Effect = "Allow",
+        Principal = {
+          Service = "logs.${var.aws_region}.amazonaws.com"
+        },
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ],
+        Resource = "*",
+        Condition = {
+          ArnLike = {
+            "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:*"
+          }
         }
       }
-    }
-  ]
-})
-
-EOF
+    ]
+  })
 
   tags = {
     Name = "${var.project_name}-cw-logs-key"

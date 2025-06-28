@@ -55,11 +55,3 @@ variable "alb_waf_arn" {
   type        = string
   default     = ""
 }
-
-# Variable legacy para compatibilidad
-variable "acm_cert_arn" {
-  description = "Certificado ACM (legacy)"
-  type        = string
-  default     = ""
-}
-

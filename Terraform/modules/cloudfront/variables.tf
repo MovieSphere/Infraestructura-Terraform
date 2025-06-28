@@ -28,13 +28,6 @@ variable "log_bucket_name" {
   type        = string
 }
 
-# Variables para WAF y seguridad
-variable "waf_web_acl_arn" {
-  description = "ARN del WAF Web ACL para CloudFront"
-  type        = string
-  default     = ""
-}
-
 variable "enable_access_logs" {
   description = "Habilitar logs de acceso en CloudFront"
   type        = bool
