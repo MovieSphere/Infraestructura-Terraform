@@ -7,7 +7,7 @@
 resource "aws_s3_bucket_public_access_block" "frontend_logs_block" {
   bucket                  = aws_s3_bucket.frontend_logs.id
   block_public_acls       = true    # CKV2_AWS_6
-  block_public_policy     = true
+  block_public_policy     = true 
   ignore_public_acls      = true
   restrict_public_buckets = true
 }

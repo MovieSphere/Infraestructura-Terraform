@@ -41,3 +41,29 @@ resource "aws_cloudwatch_metric_alarm" "error_alarm" {
   alarm_description   = "Se dispara cuando hay más de 10 errores en 5 minutos"
   alarm_actions       = [aws_sns_topic.alerts_topic.arn]
 }
+
+resource "aws_sns_topic_policy" "allow_s3_publish" {
+  arn = aws_sns_topic.alerts_topic.arn
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid       = "AllowS3Publish"
+        Effect    = "Allow"
+        Principal = {
+          Service = "s3.amazonaws.com"
+        }
+        Action    = "SNS:Publish"
+        Resource  = aws_sns_topic.alerts_topic.arn
+        Condition = {
+          StringEquals = {
+            "AWS:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      }
+    ]
+  })
+}
+
+data "aws_caller_identity" "current" {}

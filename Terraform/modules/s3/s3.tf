@@ -39,7 +39,11 @@ data "aws_iam_policy_document" "s3_publish_to_sns" {
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = [aws_s3_bucket.frontend.arn]
+      values   = [
+        aws_s3_bucket.frontend.arn,
+        aws_s3_bucket.frontend_logs.arn,
+        aws_s3_bucket.frontend_replica.arn
+      ]
     }
   }
 }
@@ -53,32 +57,19 @@ resource "aws_s3_bucket" "frontend" {
   }
 
   lifecycle {
-    ignore_changes = [bucket]
+    ignore_changes   = [bucket]
+    
   }
+}  # ← cierra correctamente aws_s3_bucket.frontend
 
-  logging {
-    target_bucket = aws_s3_bucket.frontend_logs.id
-    target_prefix = "access-logs/"
-  }
+resource "aws_s3_bucket_versioning" "frontend" {
+  bucket = aws_s3_bucket.frontend.id
 
-  replication_configuration {
-    role = aws_iam_role.replication_role.arn
-
-    rules {
-      id     = "cross-region"
-      status = "Enabled"
-
-      filter {
-        prefix = ""
-      }
-
-      destination {
-        bucket        = aws_s3_bucket.frontend_replica.arn
-        storage_class = "STANDARD"
-      }
-    }
+  versioning_configuration {
+    status = "Enabled"
   }
 }
+
 
 resource "aws_s3_bucket_ownership_controls" "frontend" {
   bucket = aws_s3_bucket.frontend.id
@@ -88,16 +79,11 @@ resource "aws_s3_bucket_ownership_controls" "frontend" {
   }
 }
 
-resource "aws_s3_bucket_versioning" "frontend_versioning" {
-  bucket = aws_s3_bucket.frontend.id
-
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
 resource "aws_s3_bucket" "frontend_logs" {
   bucket = "${var.project_name}-frontend-logs-${var.environment}"
+    lifecycle {
+    
+  }
 }
 
 resource "aws_s3_bucket_ownership_controls" "frontend_logs" {
@@ -108,13 +94,37 @@ resource "aws_s3_bucket_ownership_controls" "frontend_logs" {
   }
 }
 
-resource "aws_s3_bucket_acl" "frontend_logs_acl" {
+
+# Permitir escritura de logs por parte del servicio de logging de S3
+data "aws_caller_identity" "current" {}
+
+resource "aws_s3_bucket_policy" "frontend_logs_write" {
   bucket = aws_s3_bucket.frontend_logs.id
-  acl    = "log-delivery-write"
+  
+policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AWSLogDeliveryWrite"
+        Effect    = "Allow"
+        Principal = { Service = "logging.s3.amazonaws.com" }
+        Action    = ["s3:PutObject", "s3:GetBucketAcl"]
+        Resource  = [aws_s3_bucket.frontend_logs.arn, "${aws_s3_bucket.frontend_logs.arn}/*"]
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      }
+    ]
+  })
 }
 
 resource "aws_s3_bucket" "frontend_replica" {
   bucket = "${var.project_name}-frontend-replica-${var.environment}"
+    lifecycle {
+    
+  }
 }
 
 resource "aws_s3_bucket_ownership_controls" "frontend_replica" {
@@ -210,6 +220,10 @@ resource "aws_s3_bucket_replication_configuration" "logs_to_replica" {
     # replicate everything
     filter {}
 
+    delete_marker_replication {
+      status = "Disabled"
+    }
+
     destination {
       bucket        = aws_s3_bucket.frontend_replica.arn
       storage_class = "STANDARD"
@@ -217,9 +231,44 @@ resource "aws_s3_bucket_replication_configuration" "logs_to_replica" {
       encryption_configuration {
         replica_kms_key_id = aws_kms_key.replica.arn
       }
+
+    replication_time {
+     status = "Enabled"
+
+    time {
+    minutes = 15
+      }
+  
+  }
     }
   }
 }
+
+
+
+resource "aws_s3_bucket_replication_configuration" "frontend" {
+  bucket = aws_s3_bucket.frontend.id
+  role   = aws_iam_role.replication_role.arn
+
+  rule {
+    id     = "cross-region"
+    status = "Enabled"
+
+     filter {
+      prefix = ""
+    }
+
+    delete_marker_replication {
+      status = "Disabled"
+    }
+
+    destination {
+      bucket        = aws_s3_bucket.frontend_replica.arn
+      storage_class = "STANDARD"
+    }
+  }
+}
+
 
 resource "aws_s3_bucket_notification" "frontend" {
   bucket = aws_s3_bucket.frontend.id

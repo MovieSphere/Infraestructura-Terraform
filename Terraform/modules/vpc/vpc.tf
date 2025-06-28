@@ -133,39 +133,42 @@ resource "aws_kms_key" "cw_logs" {
   deletion_window_in_days = 30
   enable_key_rotation     = true
 
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Id": "key-default-1",
-  "Statement": [
+  policy = jsonencode({
+  Version = "2012-10-17",
+  Id      = "vpc-flow-logs-key-policy",
+  Statement = [
     {
-      "Sid": "Allow administration of the key",
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+      Sid    = "AllowRootAccount",
+      Effect = "Allow",
+      Principal = {
+        AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
       },
-      "Action": "kms:*",
-      "Resource": "*"
+      Action   = "kms:*",
+      Resource = "*"
     },
     {
-      "Sid": "Allow CloudWatch Logs usage",
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "logs.${var.aws_region}.amazonaws.com"
+      Sid    = "AllowCloudWatchLogsUse",
+      Effect = "Allow",
+      Principal = {
+        Service = "logs.${var.aws_region}.amazonaws.com"
       },
-      "Action": [
+      Action = [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
         "kms:GenerateDataKey*",
-        "kms:Decrypt"
+        "kms:DescribeKey"
       ],
-      "Resource": "*",
-      "Condition": {
-        "StringEquals": {
-          "kms:EncryptionContext:aws:logs:arn": "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:*"
+      Resource = "*",
+      Condition = {
+        ArnLike = {
+          "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:*"
         }
       }
     }
   ]
-}
+})
+
 EOF
 
   tags = {

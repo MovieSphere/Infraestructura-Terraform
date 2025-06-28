@@ -16,3 +16,8 @@ variable "alarm_actions" {
   type        = list(string)
   default     = []
 }
+
+variable "kms_key_id" {
+  description = "ARN de la clave KMS usada para cifrar logs de CloudWatch"
+  type        = string
+}

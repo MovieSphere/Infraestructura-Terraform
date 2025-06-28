@@ -46,10 +46,14 @@ resource "aws_db_instance" "auth_db" {
   multi_az                              = true                          
   enabled_cloudwatch_logs_exports       = ["postgresql"]              
 
-  copy_tags_to_snapshot                 = true                          
+  copy_tags_to_snapshot                 = true
 
   tags = {
     Name = "${var.project_name}-auth-db"
+  }
+  
+  lifecycle {
+    prevent_destroy = true
   }
 }
 
@@ -92,6 +96,10 @@ resource "aws_db_instance" "users_db" {
   tags = {
     Name = "${var.project_name}-users-db"
   }
+  
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_db_instance" "catalog_db" {
@@ -128,5 +136,9 @@ resource "aws_db_instance" "catalog_db" {
 
   tags = {
     Name = "${var.project_name}-catalog-db"
+  }
+  
+  lifecycle {
+    prevent_destroy = true
   }
 }

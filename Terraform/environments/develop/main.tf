@@ -104,6 +104,33 @@ module "media" {
   bucket_suffix = var.bucket_suffix
 }
 
+# Log group para los logs de WAF
+resource "aws_cloudwatch_log_group" "waf_logs" {
+  name              = "/aws/waf/logs"
+  retention_in_days = 30
+}
+
+# Política para permitir que WAF escriba en el log group
+resource "aws_cloudwatch_log_resource_policy" "waf_logs" {
+  policy_name = "waf-logging-policy"
+  policy_document = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "waf.amazonaws.com"
+        },
+        Action = "logs:PutLogEvents",
+        Resource = "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/waf/logs:*"
+      }
+    ]
+  })
+}
+
+data "aws_caller_identity" "current" {}
+
+
 module "cloudfront" {
   source          = "../../modules/cloudfront"
   project_name    = var.project_name
@@ -111,7 +138,7 @@ module "cloudfront" {
   bucket_name     = module.s3.bucket_name
   bucket_domain   = module.s3.bucket_domain
   cf_price_class  = var.cf_price_class
-  waf_log_destination_arn = "arn:aws:s3:::mi-bucket-waf-logs"
+  waf_log_destination_arn = aws_cloudwatch_log_group.waf_logs.arn
   log_bucket_name = module.s3.bucket_name
 }
 
@@ -155,7 +182,8 @@ module "opensearch" {
   audit_log_group_arn        = aws_cloudwatch_log_group.os_audit.arn
   index_slow_log_group_arn   = aws_cloudwatch_log_group.os_index_slow.arn
   search_slow_log_group_arn  = aws_cloudwatch_log_group.os_search_slow.arn
-  opensearch_master_user_arn = "arn:aws:iam::512248046326:user/KathiaMR"
+  opensearch_master_user_arn = "arn:aws:iam::512248046326:role/GitHubActionsTerraformRole"
+
 
   tags = {
     Name        = "${var.project_name}-os-domain"
@@ -176,6 +204,7 @@ module "acm" {
   project_name = var.project_name
   environment  = var.environment
   domain_name = var.domain_name
-  zone_id     = var.zone_id
+  hosted_zone_id = var.hosted_zone_id
+
 }
 

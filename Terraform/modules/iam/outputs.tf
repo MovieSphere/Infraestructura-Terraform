@@ -13,5 +13,5 @@ output "vpc_flow_logs_role_arn" {
 }
 output "opensearch_access_policy_json" {
   description = "JSON de la política de acceso para OpenSearch"
-  value       = aws_iam_policy.opensearch_access_policy.policy
+  value       = data.aws_iam_policy_document.opensearch_access_policy.json
 }
