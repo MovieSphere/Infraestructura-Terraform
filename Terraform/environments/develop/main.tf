@@ -95,6 +95,8 @@ module "s3" {
   bucket_suffix = var.bucket_suffix
   bucket_name   = "${var.project_name}-${var.environment}"
   kms_key_id    = module.kms.kms_key_arn
+  replication_role_arn = module.iam.s3_replication_role_arn
+
 }
 
 module "media" {
