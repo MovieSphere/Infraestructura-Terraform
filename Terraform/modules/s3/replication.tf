@@ -1,7 +1,3 @@
-# File: modules/s3/replication.tf
-
-# … (tus recursos aws_s3_bucket frontend_logs y frontend_replica) …
-
 # ——————————————
 # Public Access Block para frontend_logs
 resource "aws_s3_bucket_public_access_block" "frontend_logs_block" {

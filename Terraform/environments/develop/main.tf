@@ -47,6 +47,10 @@ module "rds" {
 module "iam" {
   source       = "../../modules/iam"
   project_name = var.project_name
+  environment             = var.environment
+  frontend_bucket_arn     = module.s3.frontend_bucket_arn
+  frontend_logs_bucket_arn = module.s3.frontend_logs_bucket_arn
+  frontend_replica_bucket_arn = module.s3.frontend_replica_bucket_arn
 }
 
 module "ec2" {
@@ -94,8 +98,6 @@ module "s3" {
   bucket_suffix = var.bucket_suffix
   bucket_name   = "${var.project_name}-${var.environment}"
   kms_key_id    = module.kms.kms_key_arn
-  replication_role_arn = module.iam.s3_replication_role_arn
-
 }
 
 module "media" {

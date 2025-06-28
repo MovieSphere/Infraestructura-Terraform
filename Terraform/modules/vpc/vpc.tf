@@ -185,7 +185,7 @@ resource "aws_cloudwatch_log_group" "vpc_logs" {
   }
 }
 
-# Desactiva todo tráfico en el Security Group por defecto
+# Desactiva to-do trafico en el Security Group por defecto
 resource "aws_default_security_group" "restrict_default" {
   vpc_id = aws_vpc.main.id
 

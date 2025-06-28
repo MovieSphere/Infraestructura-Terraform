@@ -60,7 +60,7 @@ resource "aws_s3_bucket" "frontend" {
     ignore_changes   = [bucket]
     
   }
-}  # ← cierra correctamente aws_s3_bucket.frontend
+}
 
 resource "aws_s3_bucket_versioning" "frontend" {
   bucket = aws_s3_bucket.frontend.id
@@ -132,14 +132,6 @@ resource "aws_s3_bucket_ownership_controls" "frontend_replica" {
 
   rule {
     object_ownership = "BucketOwnerEnforced"
-  }
-}
-
-resource "aws_s3_bucket_versioning" "frontend_replica_versioning" {
-  bucket = aws_s3_bucket.frontend_replica.id
-
-  versioning_configuration {
-    status = "Enabled"
   }
 }
 
@@ -227,19 +219,17 @@ resource "aws_s3_bucket_replication_configuration" "logs_to_replica" {
     destination {
       bucket        = aws_s3_bucket.frontend_replica.arn
       storage_class = "STANDARD"
-      #  optional – replicate SSE-KMS objects
       encryption_configuration {
         replica_kms_key_id = aws_kms_key.replica.arn
       }
 
-    replication_time {
-     status = "Enabled"
+      replication_time {
+       status = "Enabled"
 
-    time {
-    minutes = 15
+      time {
+        minutes = 15
+        }
       }
-  
-  }
     }
   }
 }
@@ -248,7 +238,7 @@ resource "aws_s3_bucket_replication_configuration" "logs_to_replica" {
 
 resource "aws_s3_bucket_replication_configuration" "frontend" {
   bucket = aws_s3_bucket.frontend.id
-  role   = aws_iam_role.replication_role.arn
+  role   = aws_iam_role.s3_replication.arn
 
   rule {
     id     = "cross-region"
@@ -305,12 +295,13 @@ resource "aws_iam_role" "replication_role" {
 }
 
 resource "aws_iam_role_policy" "s3_replication" {
+  name   = "${var.project_name}-s3-replication-policy-${var.environment}"
   role   = aws_iam_role.s3_replication.id
   policy = data.aws_iam_policy_document.s3_replication.json
 }
 
 resource "aws_iam_role" "s3_replication" {
-  name = "${var.project_name}-replication-role"
+  name = "${var.project_name}-replication-role-${var.environment}"
   assume_role_policy = jsonencode({
     Version : "2012-10-17",
     Statement : [{
@@ -324,14 +315,33 @@ resource "aws_iam_role" "s3_replication" {
 data "aws_iam_policy_document" "s3_replication" {
   statement {
     sid       = "SourceAccess"
-    actions   = ["s3:GetObjectVersion", "s3:GetObjectVersionAcl",
-                 "s3:GetObjectVersionTagging"]
-    resources = ["${aws_s3_bucket.frontend_logs.arn}/*"]
+    effect  = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:GetObjectVersionAcl",
+      "s3:GetObjectVersionTagging",
+      "s3:ListBucket"
+    ]
+    resources = [
+      aws_s3_bucket.frontend.arn,
+      "${aws_s3_bucket.frontend.arn}/*",
+      aws_s3_bucket.frontend_logs.arn,
+      "${aws_s3_bucket.frontend_logs.arn}/*"
+    ]
   }
   statement {
-    sid       = "DestinationWrite"
-    actions   = ["s3:ReplicateObject", "s3:ReplicateDelete", "s3:ReplicateTags"]
-    resources = ["${aws_s3_bucket.frontend_replica.arn}/*"]
+    sid     = "DestinationWrite"
+    effect  = "Allow"
+    actions = [
+      "s3:ReplicateObject",
+      "s3:ReplicateDelete",
+      "s3:ReplicateTags"
+    ]
+    resources = [
+      aws_s3_bucket.frontend_replica.arn,
+      "${aws_s3_bucket.frontend_replica.arn}/*"
+    ]
   }
 }
 
