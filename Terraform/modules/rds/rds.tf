@@ -19,7 +19,11 @@ resource "aws_db_parameter_group" "this" {
     value = "0"
   }
 
-  # Opcionalmente, registra conexiones, desconexiones y esperas de locks
+  parameter {
+    name  = "rds.force_ssl"
+    value = "1"
+  }
+
   parameter {
     name  = "log_connections"
     value = "1"
