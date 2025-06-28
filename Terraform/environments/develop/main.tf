@@ -23,6 +23,7 @@ module "cloudwatch" {
   region          = var.region
   ec2_instance_id = module.ec2.instance_id
   alarm_actions   = [module.logs.alerts_topic_arn] # Aqui se puede configurar el envio de SNS
+  kms_key_id      = module.kms.kms_key_arn
 }
 
 module "api_gateway" {
@@ -82,10 +83,8 @@ module "alb" {
 module "logs" {
   source          = "../../modules/logs"
   project_name    = var.project_name
-  region          = var.region
   log_group_name  = "MyApp-${var.project_name}-Logs"
   alarm_email     = var.alarm_email
-  ec2_instance_id = module.ec2.instance_id
 }
 
 module "s3" {
@@ -162,7 +161,6 @@ module "opensearch" {
 
   project_name               = var.project_name
   environment                = var.environment
-  region                     = var.region
   domain_name                = var.project_name
   engine_version             = var.opensearch_engine_version
   instance_type              = var.opensearch_instance_type

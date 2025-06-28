@@ -167,11 +167,6 @@ variable "domain_name" {
    type        = string
 }
 
-variable "zone_id" {
-  description = "Zona del dominio"
-  type        = string
-}
-
 variable "tls_security_policy" {
   description = "TLS security policy for domain endpoint, e.g., 'Policy-Min-TLS-1-2-2019-07'"
   type        = string
@@ -182,4 +177,10 @@ variable "waf_log_destination_arn" {
   description = "ARN del bucket S3 para los logs de WAF. El bucket debe existir o gestionarse desde Terraform."
   type        = string
   default     = "arn:aws:s3:::mi-bucket-waf-logs"
+}
+
+# ID de la zona hospedada en Route 53 para validar el certificado ACM
+variable "hosted_zone_id" {
+  description = "ID de la zona hospedada de Route 53 asociada al dominio"
+  type        = string
 }
