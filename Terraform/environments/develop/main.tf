@@ -75,7 +75,7 @@ module "ec2" {
 
 module "alb" {
   # Valor temporal para avanzar. Reemplazar con ARN real del certificado HTTPS cuando esté disponible.
-  acm_certificate_arn = "arn:aws:acm:us-east-1:000000000000:certificate/mock-certificate"
+  acm_certificate_arn = module.acm.certificate_arn
   source              = "../../modules/elb"
   project_name        = var.project_name
   alb_sg_id           = module.security.alb_sg_id
