@@ -138,30 +138,49 @@ resource "aws_cloudfront_distribution" "cdn" {
 
 resource "aws_wafv2_web_acl" "log4j_protection" {
   name        = "log4j-protect-acl"
-  description = "Protección contra vulnerabilidad Log4j (CVE-2021-44228)"
+  description = "Protección contra vulnerabilidad Log4j (CVE-2021-44228) con regla personalizada"
   scope       = "CLOUDFRONT"
   default_action {
     allow {}
   }
 
   rule {
-    name     = "AWSManagedRulesLog4jRuleSet"
+    name     = "CustomLog4jDetection"
     priority = 1
     action {
       block {}
     }
-    rule_label {
-      name = "Log4jRule"
+    statement {
+      byte_match_statement {
+        search_string = "jndi:ldap"
+        field_to_match {
+          uri_path {}
+        }
+        positional_constraint = "CONTAINS"
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "custom_log4j_protection"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "AWSManagedRulesKnownBadInputsRuleSet"
+    priority = 2
+    action {
+      block {}
     }
     statement {
       managed_rule_group_statement {
-        name        = "AWSManagedRulesLog4jRuleSet"
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
         vendor_name = "AWS"
       }
     }
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "log4j_protection"
+      metric_name                = "known_bad_inputs_protection"
       sampled_requests_enabled   = true
     }
   }
