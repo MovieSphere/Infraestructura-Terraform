@@ -1,6 +1,6 @@
 # Certificado ACM
 resource "aws_acm_certificate" "moviesphere_cert" {
-  domain_name       = var.domain_name
+  domain_name       = "moviesphere.strategyec.com"
   validation_method = "DNS"
   tags = {
     Name        = "${var.project_name}-os-domain"
@@ -12,8 +12,14 @@ resource "aws_acm_certificate" "moviesphere_cert" {
   }
 }
 
+# Validación del certificado (ahora con registros DNS gestionados)
+resource "aws_acm_certificate_validation" "moviesphere_cert_validation" {
+  certificate_arn         = aws_acm_certificate.moviesphere_cert.arn
+  # validation_record_fqdns = [for record in aws_route53_record.cert_validation_records : record.fqdn]
+}
+
 # Registros DNS de validación para Route 53
-resource "aws_route53_record" "cert_validation_records" {
+/*resource "aws_route53_record" "cert_validation_records" {
   for_each = {
     for dvo in aws_acm_certificate.moviesphere_cert.domain_validation_options :
     dvo.domain_name => {
@@ -23,15 +29,10 @@ resource "aws_route53_record" "cert_validation_records" {
     }
   }
 
-  zone_id = var.hosted_zone_id 
+  zone_id = var.hosted_zone_id
   name    = each.value.name
   type    = each.value.type
   ttl     = 300
   records = [each.value.record]
 }
-
-# Validación del certificado (ahora con registros DNS gestionados)
-resource "aws_acm_certificate_validation" "moviesphere_cert_validation" {
-  certificate_arn         = aws_acm_certificate.moviesphere_cert.arn
-  validation_record_fqdns = [for record in aws_route53_record.cert_validation_records : record.fqdn]
-}
+*/
