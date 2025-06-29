@@ -173,6 +173,28 @@ resource "aws_wafv2_web_acl" "log4j_protection" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "waf_logs" {
+  name              = "aws-waf-logs-${var.project_name}"
+  retention_in_days = 30
+}
+
+resource "aws_cloudwatch_log_resource_policy" "waf_logs_policy" {
+  policy_name = "waf-logging-policy"
+  policy_document = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "waf.amazonaws.com"
+        }
+        Action   = ["logs:PutLogEvents", "logs:CreateLogStream"]
+        Resource = aws_cloudwatch_log_group.waf_logs.arn
+      }
+    ]
+  })
+}
+
 # Configuración de logging para WAF (requerido por CKV2_AWS_31)
 resource "aws_wafv2_web_acl_logging_configuration" "waf_logging" {
   log_destination_configs = [var.waf_log_destination_arn]

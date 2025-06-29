@@ -32,6 +32,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "media_logs" {
       storage_class = "STANDARD_IA"
     }
 
+    filter {
+      prefix = "logs/"
+    }
+
     # Delete after 30 days
     expiration {
       days = 30
