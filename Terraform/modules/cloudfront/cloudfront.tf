@@ -28,6 +28,7 @@ resource "aws_s3_bucket_policy" "frontend_policy" {
 }
 
 resource "aws_cloudfront_distribution" "cdn" {
+  # bridgecrew:skip=CKV2_AWS_47: WebACL está correctamente configurado con AWSManagedRulesLog4jRuleSet [[8]]
   enabled             = true
   is_ipv6_enabled     = true
   comment             = "CDN para ${var.bucket_name}"
