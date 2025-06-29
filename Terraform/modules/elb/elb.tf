@@ -25,12 +25,6 @@ resource "aws_lb" "app_alb" {
   }
 }
 
-resource "aws_wafv2_web_acl_association" "alb_waf" {
-  count        = var.alb_waf_arn != "" ? 1 : 0
-  resource_arn = aws_lb.app_alb.arn
-  web_acl_arn  = var.alb_waf_arn
-}
-
 resource "aws_wafv2_web_acl_association" "alb_assoc" {
   resource_arn = aws_lb.app_alb.arn
   web_acl_arn  = var.web_acl_arn
