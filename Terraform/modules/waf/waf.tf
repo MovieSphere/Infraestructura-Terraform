@@ -9,8 +9,8 @@ resource "aws_wafv2_web_acl" "main" {
 
   # Regla para bloquear IPs maliciosas
   rule {
-    name     = "KnownBadInputs-Log4j"
-    priority = 2
+    name     = "AWSManagedRulesCommonRuleSet"
+    priority = 1
 
     override_action {
       none {}
