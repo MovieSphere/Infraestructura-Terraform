@@ -157,6 +157,10 @@ resource "aws_wafv2_web_acl" "log4j_protection" {
           uri_path {}
         }
         positional_constraint = "CONTAINS"
+        text_transformation {
+          priority = 0
+          type     = "NONE"
+        }
       }
     }
     visibility_config {
