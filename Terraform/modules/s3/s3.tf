@@ -81,8 +81,10 @@ resource "aws_s3_bucket_ownership_controls" "frontend" {
 
 resource "aws_s3_bucket" "frontend_logs" {
   bucket = "${var.project_name}-frontend-logs-${var.environment}"
-    lifecycle {
-    
+
+  tags = {
+    Name        = "${var.project_name}-frontend-logs"
+    Environment = var.environment
   }
 }
 
@@ -122,8 +124,9 @@ policy = jsonencode({
 
 resource "aws_s3_bucket" "frontend_replica" {
   bucket = "${var.project_name}-frontend-replica-${var.environment}"
-    lifecycle {
-    
+  tags = {
+    Name        = "${var.project_name}-frontend-replica"
+    Environment = var.environment
   }
 }
 
