@@ -49,14 +49,8 @@ variable "alb_logs_bucket" {
   default     = ""
 }
 
-# Variables para WAF
-variable "alb_waf_arn" {
-  description = "ARN del WAF Web ACL para proteger el ALB"
-  type        = string
-  default     = ""
-}
-
 variable "web_acl_arn" {
   description = "ARN del WAF Web ACL a asociar al ALB"
   type        = string
+  default     = ""
 }
