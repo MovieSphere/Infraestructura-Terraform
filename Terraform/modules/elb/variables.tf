@@ -30,7 +30,7 @@ variable "enable_https" {
   default     = false
 }
 
-variable "acm_certificate_arn" {
+variable "certificate_arn" {
   description = "ARN del certificado ACM para HTTPS"
   type        = string
   default     = ""
@@ -54,4 +54,9 @@ variable "alb_waf_arn" {
   description = "ARN del WAF Web ACL para proteger el ALB"
   type        = string
   default     = ""
+}
+
+variable "web_acl_arn" {
+  description = "ARN del WAF Web ACL a asociar al ALB"
+  type        = string
 }

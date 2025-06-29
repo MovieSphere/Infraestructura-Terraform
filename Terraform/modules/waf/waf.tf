@@ -1,4 +1,3 @@
-
 resource "aws_wafv2_web_acl" "main" {
   name        = "${var.project_name}-web-acl"
   description = "WAF Web ACL para proteger recursos"
@@ -10,8 +9,8 @@ resource "aws_wafv2_web_acl" "main" {
 
   # Regla para bloquear IPs maliciosas
   rule {
-    name     = "AWSManagedRulesCommonRuleSet"
-    priority = 1
+    name     = "KnownBadInputs-Log4j"
+    priority = 2
 
     override_action {
       none {}
@@ -26,7 +25,7 @@ resource "aws_wafv2_web_acl" "main" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "AWSManagedRulesCommonRuleSetMetric"
+      metric_name                = "KnownBadInputsLog4j"
       sampled_requests_enabled   = true
     }
   }

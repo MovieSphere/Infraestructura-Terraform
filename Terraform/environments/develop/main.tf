@@ -74,14 +74,19 @@ module "ec2" {
 }
 
 module "alb" {
-  # Valor temporal para avanzar. Reemplazar con ARN real del certificado HTTPS cuando esté disponible.
-  acm_certificate_arn = module.acm.certificate_arn
   source              = "../../modules/elb"
   project_name        = var.project_name
   alb_sg_id           = module.security.alb_sg_id
   vpc_id              = module.vpc.vpc_id
   public_subnet_ids   = module.vpc.public_subnet_ids
   instance_ids        = [module.ec2.instance_id]
+  certificate_arn     = module.acm.moviesphere_cert_arn
+  web_acl_arn         = module.waf.web_acl_arn
+}
+
+module "waf" {
+  source              = "../../modules/waf"
+  project_name        = var.project_name
 }
 
 module "logs" {
@@ -206,7 +211,5 @@ module "acm" {
   project_name = var.project_name
   environment  = var.environment
   domain_name = var.domain_name
-  # hosted_zone_id = var.hosted_zone_id
-
 }
 

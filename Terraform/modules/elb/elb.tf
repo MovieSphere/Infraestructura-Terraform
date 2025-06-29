@@ -31,6 +31,11 @@ resource "aws_wafv2_web_acl_association" "alb_waf" {
   web_acl_arn  = var.alb_waf_arn
 }
 
+resource "aws_wafv2_web_acl_association" "alb_assoc" {
+  resource_arn = aws_lb.app_alb.arn
+  web_acl_arn  = var.web_acl_arn
+}
+
 resource "aws_lb_target_group" "tg_auth" {
   name     = "${var.project_name}-tg-auth"
   port     = 8091
@@ -130,7 +135,7 @@ resource "aws_lb_listener" "https_listener" {
   port              = 443
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn   = var.acm_certificate_arn
+  certificate_arn   = var.certificate_arn
 
   default_action {
     type             = "forward"

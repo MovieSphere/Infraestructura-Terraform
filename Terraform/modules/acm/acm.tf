@@ -1,6 +1,6 @@
 # Certificado ACM
 resource "aws_acm_certificate" "moviesphere_cert" {
-  domain_name       = "moviesphere.strategyec.com"
+  domain_name       = var.domain_name
   validation_method = "DNS"
   tags = {
     Name        = "${var.project_name}-os-domain"

@@ -104,12 +104,6 @@ variable "flow_logs_role_arn" {
   type        = string
 }
 
-variable "acm_certificate_arn" {
-  description = "ARN del certificado TLS para el ALB (valor temporal)"
-  type        = string
-  default     = "arn:aws:acm:us-east-1:000000000000:certificate/mock-certificate"
-}
-
 variable "alb_sg_id" {
   description = "ID del Security Group usado por el ALB"
   type        = string
