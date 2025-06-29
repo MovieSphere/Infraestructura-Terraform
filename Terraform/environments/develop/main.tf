@@ -213,3 +213,8 @@ module "acm" {
   domain_name = var.domain_name
 }
 
+resource "aws_wafv2_web_acl_association" "alb_assoc" {
+  resource_arn = module.alb.alb_arn
+  web_acl_arn  = module.waf.web_acl_arn
+}
+
