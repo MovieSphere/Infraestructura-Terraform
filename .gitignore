@@ -35,3 +35,13 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# Archivos de logs
+*.log
+logs/
+
+# Código comprimido para despliegue
+deploy/
+
+# Archivos de entorno
+.env
