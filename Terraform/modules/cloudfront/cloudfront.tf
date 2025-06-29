@@ -33,8 +33,8 @@ resource "aws_cloudfront_distribution" "cdn" {
   is_ipv6_enabled     = true
   comment             = "CDN para ${var.bucket_name}"
   default_root_object = "index.html"
-  web_acl_id = aws_wafv2_web_acl.log4j_protection.arn 
-  
+  web_acl_id = aws_wafv2_web_acl.log4j_protection.arn
+
   logging_config {
     bucket = "${var.log_bucket_name}.s3.amazonaws.com"
     include_cookies = false
@@ -138,7 +138,7 @@ resource "aws_cloudfront_distribution" "cdn" {
 
 resource "aws_wafv2_web_acl" "log4j_protection" {
   name        = "log4j-protect-acl"
-  description = "Protección contra vulnerabilidad Log4j (CVE-2021-44228) con regla personalizada"
+  description = "Proteccion contra vulnerabilidad Log4j CVE-2021-44228 con regla personalizada"
   scope       = "CLOUDFRONT"
   default_action {
     allow {}

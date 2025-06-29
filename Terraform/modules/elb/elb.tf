@@ -24,7 +24,6 @@ resource "aws_lb" "app_alb" {
 }
 
 resource "aws_wafv2_web_acl_association" "alb_association" {
-  count        = var.web_acl_arn != "" ? 1 : 0
   resource_arn = aws_lb.app_alb.arn
   web_acl_arn  = var.web_acl_arn
 }

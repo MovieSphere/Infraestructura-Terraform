@@ -81,7 +81,7 @@ module "alb" {
   public_subnet_ids   = module.vpc.public_subnet_ids
   instance_ids        = [module.ec2.instance_id]
   certificate_arn     = module.acm.moviesphere_cert_arn
-  web_acl_arn         = aws_wafv2_web_acl_association.alb_assoc.web_acl_arn
+  web_acl_arn         = aws_wafv2_web_acl.main.arn
 }
 
 module "waf" {
