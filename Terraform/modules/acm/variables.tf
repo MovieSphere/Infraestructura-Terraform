@@ -17,7 +17,7 @@ variable "environment" {
 }
 
 # ID de la zona hospedada en Route 53 para validar el certificado ACM
-variable "hosted_zone_id" {
-  description = "ID de la zona hospedada de Route 53 asociada al dominio"
-  type        = string
-}
+# variable "hosted_zone_id" {
+#   description = "ID de la zona hospedada de Route 53 asociada al dominio"
+#   type        = string
+# }

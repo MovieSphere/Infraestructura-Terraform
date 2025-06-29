@@ -34,11 +34,11 @@ resource "aws_wafv2_web_acl_association" "alb_waf" {
 resource "aws_lb_target_group" "tg_auth" {
   name     = "${var.project_name}-tg-auth"
   port     = 8091
-  protocol = "HTTPS"
+  protocol = "HTTP"
   vpc_id   = var.vpc_id
 
   health_check {
-    protocol = "HTTPS"
+    protocol = "HTTP"
     path     = "/health"
     interval = 30
     timeout  = 5
@@ -51,11 +51,11 @@ resource "aws_lb_target_group" "tg_auth" {
 resource "aws_lb_target_group" "tg_user" {
   name     = "${var.project_name}-tg-user"
   port     = 8092
-  protocol = "HTTPS"
+  protocol = "HTTP"
   vpc_id   = var.vpc_id
 
   health_check {
-    protocol = "HTTPS"
+    protocol = "HTTP"
     path     = "/health"
     interval = 30
     timeout  = 5
@@ -68,11 +68,11 @@ resource "aws_lb_target_group" "tg_user" {
 resource "aws_lb_target_group" "tg" {
   name     = "${var.project_name}-tg"
   port     = 3000  # Puerto de la aplicación
-  protocol = "HTTPS"
+  protocol = "HTTP"
   vpc_id   = var.vpc_id
 
   health_check {
-    protocol = "HTTPS" 
+    protocol = "HTTP"
     path     = "/health"
     interval = 30
     timeout  = 5
@@ -125,7 +125,7 @@ resource "aws_lb_listener" "http_listener" {
 
 
 resource "aws_lb_listener" "https_listener" {
-  count             = var.enable_https && var.acm_certificate_arn != "" ? 1 : 0
+  count             = var.enable_https ? 1 : 0
   load_balancer_arn = aws_lb.app_alb.arn
   port              = 443
   protocol          = "HTTPS"
