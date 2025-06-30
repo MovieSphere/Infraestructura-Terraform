@@ -196,6 +196,7 @@ module "opensearch" {
     Name        = "${var.project_name}-os-domain"
     Environment = var.environment
   }
+  opensearch_sg = var.opensearch_sg
 }
 
 module "kms" {
