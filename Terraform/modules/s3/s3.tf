@@ -88,6 +88,7 @@ resource "aws_s3_bucket" "frontend_logs" {
   }
 }
 
+# bridgecrew:skip=CKV2_AWS_65: CloudFront logging bucket requiere ACLs para poder escribir los registros
 resource "aws_s3_bucket_ownership_controls" "frontend_logs" {
   bucket = aws_s3_bucket.frontend_logs.id
 
