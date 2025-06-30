@@ -22,7 +22,10 @@ resource "aws_s3_bucket_policy" "frontend_policy" {
         Effect    = "Allow"
         Principal = { Service = "cloudfront.amazonaws.com" }
         Action    = ["s3:GetBucketAcl", "s3:PutBucketAcl", "s3:PutObject"]
-        Resource  = "${var.access_logs_bucket}/*"
+        Resource = [
+          "arn:aws:s3:::${var.access_logs_bucket}",
+          "arn:aws:s3:::${var.access_logs_bucket}/*"
+        ]
         Condition = {
           StringEquals = {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
