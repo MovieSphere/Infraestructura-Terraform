@@ -92,7 +92,7 @@ resource "aws_s3_bucket_ownership_controls" "frontend_logs" {
   bucket = aws_s3_bucket.frontend_logs.id
 
   rule {
-    object_ownership = "BucketOwnerEnforced"
+    object_ownership = "BucketOwnerPreferred"
   }
 }
 
