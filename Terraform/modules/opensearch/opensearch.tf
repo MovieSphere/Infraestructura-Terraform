@@ -53,7 +53,7 @@ resource "aws_opensearch_domain" "moviesphere" {
 
   vpc_options {
     subnet_ids         = var.vpc_subnet_ids
-    security_group_ids = [aws_security_group.opensearch_sg.id]  # Usar SG personalizado (CKV_AWS_248) [[4]]
+    security_group_ids = [var.opensearch_sg]
   }
 
   log_publishing_options {
