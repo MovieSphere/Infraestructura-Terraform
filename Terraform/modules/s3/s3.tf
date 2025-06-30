@@ -102,23 +102,13 @@ data "aws_caller_identity" "current" {}
 
 resource "aws_s3_bucket_policy" "frontend_logs_write" {
   bucket = aws_s3_bucket.frontend_logs.id
-  
-policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid       = "AWSLogDeliveryWrite"
-        Effect    = "Allow"
-        Principal = { Service = "logging.s3.amazonaws.com" }
-        Action    = ["s3:PutObject", "s3:GetBucketAcl"]
-        Resource  = [aws_s3_bucket.frontend_logs.arn, "${aws_s3_bucket.frontend_logs.arn}/*"]
-        Condition = {
-          StringEquals = {
-            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-          }
-        }
-      }
-    ]
+  policy = jsonencode({
+    Statement = [{
+      Principal = { Service = "logging.s3.amazonaws.com" }
+      Action    = ["s3:PutObject", "s3:GetBucketAcl"]
+      Resource  = [aws_s3_bucket.frontend_logs.arn, "${aws_s3_bucket.frontend_logs.arn}/*"]
+      Condition = { StringEquals = { "aws:SourceAccount" = data.aws_caller_identity.current.account_id } }
+    }]
   })
 }
 
@@ -167,6 +157,15 @@ resource "aws_s3_bucket_public_access_block" "frontend" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
+resource "aws_s3_bucket_public_access_block" "frontend_logs" {
+  bucket                  = aws_s3_bucket.frontend_logs.id
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "frontend" {
   bucket = aws_s3_bucket.frontend.id
