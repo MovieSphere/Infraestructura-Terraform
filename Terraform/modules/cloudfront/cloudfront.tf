@@ -169,6 +169,12 @@ resource "aws_wafv2_web_acl" "log4j_protection" {
       }
     }
 
+    # override_action for managed rules
+    override_action {
+      none {
+      }
+    }
+
     visibility_config {
       sampled_requests_enabled   = true
       cloudwatch_metrics_enabled = true
