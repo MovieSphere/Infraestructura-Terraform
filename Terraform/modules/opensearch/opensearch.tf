@@ -103,3 +103,28 @@ resource "aws_opensearch_domain" "moviesphere" {
     Environment = var.environment
   }
 }
+
+# Definición de la política de acceso
+data "aws_iam_policy_document" "opensearch_access_policy" {
+  statement {
+    actions   = ["es:*", "logs:CreateLogStream", "logs:PutLogEvents"]
+    resources = [
+      "arn:aws:es:us-east-1:512248046326:domain/${var.domain_name}/*",
+      "arn:aws:logs:us-east-1:512248046326:log-group:/os/moviesphere/search-slow-logs:*"
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+  }
+}
+
+# Asignación de la política al dominio
+resource "aws_opensearch_domain_policy" "moviesphere" {
+  domain_name     = aws_opensearch_domain.moviesphere.domain_name
+  access_policies = data.aws_iam_policy_document.opensearch_access_policy.json
+}
+
+resource "aws_cloudwatch_log_group" "search_slow_logs" {
+  name = "/os/moviesphere/search-slow-logs"
+}
