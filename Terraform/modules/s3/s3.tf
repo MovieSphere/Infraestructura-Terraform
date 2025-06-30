@@ -212,8 +212,15 @@ resource "aws_s3_bucket_replication_configuration" "logs_to_replica" {
     id     = "logs-replication"
     status = "Enabled"
 
-    # Replicate everything
+    # Filtro para replicar to-do
     filter {}
+
+    # Criterios de selección de objetos (requerido para SSE-KMS)
+    source_selection_criteria {
+      sse_kms_encrypted_objects {
+        status = "Enabled"  # Solo replica objetos cifrados con KMS
+      }
+    }
 
     delete_marker_replication {
       status = "Disabled"
@@ -222,10 +229,11 @@ resource "aws_s3_bucket_replication_configuration" "logs_to_replica" {
     destination {
       bucket        = aws_s3_bucket.frontend_replica.arn
       storage_class = "STANDARD"
-      encryption_configuration {
-        replica_kms_key_id = var.kms_key_id  # Use the KMS key from terraform.tfvars
-      }
 
+      # Configuración de cifrado en destino
+      encryption_configuration {
+        replica_kms_key_id = var.kms_key_id  # KMS Key ARN
+      }
       replication_time {
         status = "Enabled"
         time {
