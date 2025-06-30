@@ -143,11 +143,11 @@ module "cloudfront" {
   source          = "../../modules/cloudfront"
   project_name    = var.project_name
   bucket_arn      = module.s3.bucket_arn
-  bucket_name     = module.s3.bucket_name
-  bucket_domain   = module.s3.bucket_domain
+  bucket_name      = module.s3.frontend_logs_bucket_domain_name
+  bucket_domain    = module.s3.frontend_logs_bucket_domain_name
+  log_bucket_name  = module.s3.frontend_logs_bucket_domain_name
   cf_price_class  = var.cf_price_class
   waf_log_destination_arn = aws_cloudwatch_log_group.waf_logs.arn
-  log_bucket_name = module.s3.bucket_name
 }
 
 resource "aws_cloudwatch_log_group" "os_audit" {

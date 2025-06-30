@@ -27,3 +27,13 @@ output "frontend_replica_bucket_arn" {
   description = "ARN of the frontend replica bucket"
   value       = aws_s3_bucket.frontend_replica.arn
 }
+
+output "frontend_logs_bucket_domain_name" {
+  description = "Nombre DNS completo del bucket de logs ej: my-bucket.s3.amazonaws.com"
+  value       = aws_s3_bucket.frontend_logs.bucket_domain_name
+}
+
+output "frontend_logs_bucket_regional_domain_name" {
+  description = "Nombre DNS regional del bucket de logs ej: my-bucket.s3.us-east-1.amazonaws.com"
+  value       = aws_s3_bucket.frontend_logs.bucket_regional_domain_name
+}

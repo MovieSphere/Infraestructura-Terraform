@@ -103,9 +103,12 @@ data "aws_caller_identity" "current" {}
 resource "aws_s3_bucket_policy" "frontend_logs_write" {
   bucket = aws_s3_bucket.frontend_logs.id
   policy = jsonencode({
+    Version   = "2012-10-17"
     Statement = [{
+      Sid       = "AWSLogDeliveryWrite"
+      Effect    = "Allow"
       Principal = { Service = "logging.s3.amazonaws.com" }
-      Action    = ["s3:PutObject", "s3:GetBucketAcl"]
+      Action    = ["s3:GetBucketAcl", "s3:PutBucketAcl", "s3:PutObject"]
       Resource  = [aws_s3_bucket.frontend_logs.arn, "${aws_s3_bucket.frontend_logs.arn}/*"]
       Condition = { StringEquals = { "aws:SourceAccount" = data.aws_caller_identity.current.account_id } }
     }]
