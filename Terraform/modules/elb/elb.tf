@@ -1,3 +1,4 @@
+# bridgecrew:skip=CKV2_AWS_76: WAFv2 WebACL con AWSManagedRulesLog4jRuleSet se asocia al ALB mediante aws_wafv2_web_acl_association en el root module.
 resource "aws_lb" "app_alb" {
   name               = "${var.project_name}-alb"
   internal           = false
