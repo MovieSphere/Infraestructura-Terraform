@@ -136,6 +136,12 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 }
 
+
+provider "aws" {
+  alias  = "global"
+  region = "us-east-1"
+}
+
 resource "aws_wafv2_web_acl" "log4j_protection" {
   provider    = aws.global
   name        = "log4j-protect-acl"
