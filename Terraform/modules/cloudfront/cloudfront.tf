@@ -145,11 +145,6 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 }
 
-provider "aws" {
-  alias  = "global"
-  region = "us-east-1"
-}
-
 resource "aws_wafv2_web_acl" "log4j_protection" {
   provider    = aws.global
   name        = "log4j-protect-acl"
@@ -324,7 +319,15 @@ resource "aws_cloudfront_distribution" "moviesphere" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    # Deshabilitamos el certificado por defecto:
+    cloudfront_default_certificate = false
+
+    # Usamos el ACM certificate ARN que pasamos como variable:
+    acm_certificate_arn            = var.acm_certificate_arn
+
+    # Métodos de soporte SSL/TLS (variables ya definidas):
+    ssl_support_method             = var.ssl_support_method
+    minimum_protocol_version       = var.minimum_protocol_version
   }
 
   # Asociar el Web ACL (opcional, se puede hacer después)

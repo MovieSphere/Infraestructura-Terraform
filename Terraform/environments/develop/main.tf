@@ -141,6 +141,9 @@ data "aws_caller_identity" "current" {}
 
 module "cloudfront" {
   source             = "../../modules/cloudfront"
+  providers = {
+    aws.global = aws.global
+  }
   project_name       = var.project_name
   bucket_arn         = module.s3.bucket_arn
   bucket_name        = module.s3.frontend_logs_bucket_domain_name
@@ -148,7 +151,11 @@ module "cloudfront" {
   log_bucket_name    = module.s3.frontend_logs_bucket_domain_name
   access_logs_bucket = module.s3.frontend_logs_bucket_name
   cf_price_class     = var.cf_price_class
+  acm_certificate_arn = module.acm.moviesphere_cert_arn
   waf_log_destination_arn = aws_cloudwatch_log_group.waf_logs.arn
+  ssl_support_method  = "sni-only"
+  minimum_protocol_version = "TLSv1.2_2021"
+  enable_custom_ssl  = true
 }
 
 resource "aws_cloudwatch_log_group" "os_audit" {
