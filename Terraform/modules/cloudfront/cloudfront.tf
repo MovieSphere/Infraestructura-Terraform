@@ -225,7 +225,7 @@ resource "aws_wafv2_web_acl" "log4j_protection" {
     sampled_requests_enabled    = true
   }
 
-  depends_on = [aws_cloudfront_distribution.moviesphere]
+  # depends_on = [aws_cloudfront_distribution.moviesphere]
 }
 
 resource "aws_cloudwatch_log_group" "waf_logs" {
