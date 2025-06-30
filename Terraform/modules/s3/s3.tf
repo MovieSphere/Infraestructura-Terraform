@@ -212,7 +212,7 @@ resource "aws_s3_bucket_replication_configuration" "logs_to_replica" {
     id     = "logs-replication"
     status = "Enabled"
 
-    # replicate everything
+    # Replicate everything
     filter {}
 
     delete_marker_replication {
@@ -223,20 +223,18 @@ resource "aws_s3_bucket_replication_configuration" "logs_to_replica" {
       bucket        = aws_s3_bucket.frontend_replica.arn
       storage_class = "STANDARD"
       encryption_configuration {
-        replica_kms_key_id = var.kms_key_id
+        replica_kms_key_id = var.kms_key_id  # Use the KMS key from terraform.tfvars
       }
 
       replication_time {
-       status = "Enabled"
-
-      time {
-        minutes = 15
+        status = "Enabled"
+        time {
+          minutes = 15
         }
       }
     }
   }
 }
-
 
 
 resource "aws_s3_bucket_replication_configuration" "frontend" {
@@ -306,11 +304,11 @@ resource "aws_iam_role_policy" "s3_replication" {
 resource "aws_iam_role" "s3_replication" {
   name = "${var.project_name}-replication-role-${var.environment}"
   assume_role_policy = jsonencode({
-    Version : "2012-10-17",
-    Statement : [{
-      Effect : "Allow",
-      Principal : { Service : "s3.amazonaws.com" },
-      Action : "sts:AssumeRole"
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = { Service = "s3.amazonaws.com" }
+      Action = "sts:AssumeRole"
     }]
   })
 }
@@ -318,8 +316,8 @@ resource "aws_iam_role" "s3_replication" {
 data "aws_iam_policy_document" "s3_replication" {
   statement {
     sid       = "SourceAccess"
-    effect  = "Allow"
-    actions = [
+    effect    = "Allow"
+    actions   = [
       "s3:GetObject",
       "s3:GetObjectVersion",
       "s3:GetObjectVersionAcl",
@@ -345,6 +343,16 @@ data "aws_iam_policy_document" "s3_replication" {
       aws_s3_bucket.frontend_replica.arn,
       "${aws_s3_bucket.frontend_replica.arn}/*"
     ]
+  }
+  statement {
+    sid     = "KMSAccess"
+    effect  = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = [var.kms_key_id]
   }
 }
 
