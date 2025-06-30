@@ -154,7 +154,11 @@ resource "aws_wafv2_web_acl" "log4j_protection" {
   rule {
     name     = "CommonRuleSet"
     priority = 0
-    action   { block {} }
+    action   {
+      block {
+
+      }
+    }
 
     statement {
       managed_rule_group_statement {
