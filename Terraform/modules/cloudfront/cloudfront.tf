@@ -152,21 +152,21 @@ resource "aws_wafv2_web_acl" "log4j_protection" {
   }
 
   rule {
-    name     = "AWSManagedRulesLog4jRuleSet"
+    name     = "CommonRuleSet"
     priority = 0
-    action {
-      block {}
-    }
+    action   { block {} }
+
     statement {
       managed_rule_group_statement {
-        name        = "AWSManagedRulesLog4jRuleSet"
         vendor_name = "AWS"
+        name        = "AWSManagedRulesCommonRuleSet"
       }
     }
+
     visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "Log4jRule"
       sampled_requests_enabled   = true
+      cloudwatch_metrics_enabled = true
+      metric_name                = "common_rules"
     }
   }
 
@@ -302,5 +302,5 @@ resource "aws_cloudfront_distribution" "moviesphere" {
   }
 
   # Asociar el Web ACL (opcional, se puede hacer después)
-  # web_acl_id = aws_wafv2_web_acl.log4j_protection.arn
+  web_acl_id = aws_wafv2_web_acl.log4j_protection.arn
 }
