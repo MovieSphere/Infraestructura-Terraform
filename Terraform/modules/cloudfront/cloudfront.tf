@@ -49,21 +49,21 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
   # Origin failover group
-  origin_group {
-    origin_id = "failover-group"
-
-    # Aquí defines cuándo hacer el failover
-    failover_criteria {
-      status_codes = [403, 404, 500, 502, 503, 504]
-    }
-
-    member {
-      origin_id = "primary-origin"
-    }
-    member {
-      origin_id = "failover-origin"
-    }
-  }
+  # origin_group {
+  #   origin_id = "failover-group"
+  #
+  #   # Aquí defines cuándo hacer el failover
+  #   failover_criteria {
+  #     status_codes = [403, 404, 500, 502, 503, 504]
+  #   }
+  #
+  #   member {
+  #     origin_id = "primary-origin"
+  #   }
+  #   member {
+  #     origin_id = "failover-origin"
+  #   }
+  # }
 
   dynamic "origin" {
     for_each = var.failover_bucket_domain != "" ? [1] : []
