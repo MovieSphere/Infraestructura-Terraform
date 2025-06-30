@@ -51,8 +51,8 @@ resource "aws_opensearch_domain" "moviesphere" {
   }
 
   vpc_options {
-    subnet_ids         = var.vpc_subnet_ids
-    security_group_ids = ["sg-0fe2750fcb5f31318"]
+    subnet_ids         = ["subnet-0d8c3b0a9237dbb93", "subnet-0a6e3d6a9ddf451e7"]
+    security_group_ids = ["sg-071708ddaa092e351"]
   }
 
   log_publishing_options {
