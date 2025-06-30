@@ -238,7 +238,9 @@ resource "aws_s3_bucket_replication_configuration" "logs_to_replica" {
       # Bloque replication_time fuera de destination
       replication_time {
         status  = "Enabled"
-        minutes = 15  # Sin el sub-bloque `time`
+        time {
+          minutes = 15
+        }
       }
 
       # Requerido por AWS si se usa replication_time
