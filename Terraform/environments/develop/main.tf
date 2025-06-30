@@ -140,13 +140,14 @@ data "aws_caller_identity" "current" {}
 
 
 module "cloudfront" {
-  source          = "../../modules/cloudfront"
-  project_name    = var.project_name
-  bucket_arn      = module.s3.bucket_arn
-  bucket_name      = module.s3.frontend_logs_bucket_domain_name
-  bucket_domain    = module.s3.frontend_logs_bucket_domain_name
-  log_bucket_name  = module.s3.frontend_logs_bucket_domain_name
-  cf_price_class  = var.cf_price_class
+  source             = "../../modules/cloudfront"
+  project_name       = var.project_name
+  bucket_arn         = module.s3.bucket_arn
+  bucket_name        = module.s3.frontend_logs_bucket_domain_name
+  bucket_domain      = module.s3.frontend_logs_bucket_domain_name
+  log_bucket_name    = module.s3.frontend_logs_bucket_domain_name
+  access_logs_bucket = module.s3.frontend_logs_bucket_name
+  cf_price_class     = var.cf_price_class
   waf_log_destination_arn = aws_cloudwatch_log_group.waf_logs.arn
 }
 

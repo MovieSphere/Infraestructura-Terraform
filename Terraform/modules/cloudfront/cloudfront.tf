@@ -266,11 +266,6 @@ resource "aws_wafv2_web_acl_logging_configuration" "waf_logging" {
   resource_arn            = aws_wafv2_web_acl.log4j_protection.arn
 }
 
-resource "aws_wafv2_web_acl_association" "cloudfront_waf" {
-  web_acl_arn = aws_wafv2_web_acl.log4j_protection.arn
-  resource_arn = aws_cloudfront_distribution.cdn.arn
-}
-
 resource "aws_cloudfront_distribution" "moviesphere" {
   origin {
     domain_name = "moviesphere-alb-73854958.us-east-1.elb.amazonaws.com"

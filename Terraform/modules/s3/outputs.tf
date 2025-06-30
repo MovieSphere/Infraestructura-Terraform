@@ -37,3 +37,8 @@ output "frontend_logs_bucket_regional_domain_name" {
   description = "Nombre DNS regional del bucket de logs ej: my-bucket.s3.us-east-1.amazonaws.com"
   value       = aws_s3_bucket.frontend_logs.bucket_regional_domain_name
 }
+
+output "frontend_logs_bucket_name" {
+  description = "Nombre simple del bucket de logs (e.g. my-project-frontend-logs-dev)"
+  value       = aws_s3_bucket.frontend_logs.bucket
+}
