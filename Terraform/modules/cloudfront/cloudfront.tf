@@ -148,7 +148,9 @@ resource "aws_wafv2_web_acl" "log4j_protection" {
   description = "Proteccion contra vulnerabilidad Log4j CVE-2021-44228 con regla personalizada"
   scope       = "CLOUDFRONT"
   default_action {
-    allow {}
+    allow {
+
+    }
   }
 
   rule {
@@ -170,17 +172,23 @@ resource "aws_wafv2_web_acl" "log4j_protection" {
     visibility_config {
       sampled_requests_enabled   = true
       cloudwatch_metrics_enabled = true
-      metric_name                = "common_rules"
+      metric_name                = "AnonymousIpList"
     }
   }
 
   rule {
-    name     = "CustomLog4jDetection"
+    name     = "AWSKnownBadInputs"
     priority = 1
     action {
-      block {}
+      block {
+
+      }
     }
     statement {
+      managed_rule_group_statement {
+        vendor_name = "AWS"
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
+      }
       byte_match_statement {
         search_string = "jndi:ldap"
         field_to_match {
@@ -195,7 +203,7 @@ resource "aws_wafv2_web_acl" "log4j_protection" {
     }
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "custom_log4j_protection"
+      metric_name                = "KnownBadInputs"
       sampled_requests_enabled   = true
     }
   }
