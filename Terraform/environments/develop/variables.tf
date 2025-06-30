@@ -174,7 +174,7 @@ variable "waf_log_destination_arn" {
 }
 
 # ID de la zona hospedada en Route 53 para validar el certificado ACM
-variable "opensearch_sg" {
+variable "opensearch_id" {
     description = "ID del Security Group personalizado para OpenSearch"
     type        = string
 }

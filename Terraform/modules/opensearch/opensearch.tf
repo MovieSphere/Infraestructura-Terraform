@@ -9,7 +9,7 @@ resource "aws_kms_key" "opensearch_kms" {
 resource "aws_security_group" "opensearch_sg" {
   name        = "${var.project_name}-opensearch-sg"
   description = "Reglas de seguridad para OpenSearch"
-  vpc_id      = var.vpc_id  # Requerido para evitar usar el Security Group por defecto [[4]]
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port   = 443
@@ -32,7 +32,6 @@ resource "aws_security_group" "opensearch_sg" {
   }
 }
 
-# Dominio de OpenSearch con configuración segura
 resource "aws_opensearch_domain" "moviesphere" {
   domain_name           = "moviesphere"
   engine_version        = "OpenSearch_2.11"
@@ -53,7 +52,7 @@ resource "aws_opensearch_domain" "moviesphere" {
 
   vpc_options {
     subnet_ids         = var.vpc_subnet_ids
-    security_group_ids = [var.opensearch_sg]
+    security_group_ids = ["sg-0fe2750fcb5f31318"]
   }
 
   log_publishing_options {

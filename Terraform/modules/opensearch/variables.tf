@@ -72,11 +72,6 @@ variable "vpc_subnet_ids" {
   type        = list(string)
 }
 
-variable "opensearch_sg" {
-    description = "ID del Security Group personalizado para OpenSearch"
-    type        = string
-}
-
 variable "security_group_ids" {
   description = "Security Groups para OpenSearch en VPC"
   type        = list(string)

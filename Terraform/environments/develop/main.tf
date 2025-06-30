@@ -182,7 +182,7 @@ module "opensearch" {
 
   # VPC
   vpc_subnet_ids        = module.vpc.private_subnet_ids      # subredes privadas
-  security_group_ids    = [module.security.ec2_sg_id]        # SGs adecuados
+  security_group_ids    = [var.opensearch_id]
   vpc_id                = module.vpc.vpc_id
 
   # Logging (ARNs de CloudWatch Log Groups)
@@ -196,7 +196,6 @@ module "opensearch" {
     Name        = "${var.project_name}-os-domain"
     Environment = var.environment
   }
-  opensearch_sg = var.opensearch_sg
 }
 
 module "kms" {
