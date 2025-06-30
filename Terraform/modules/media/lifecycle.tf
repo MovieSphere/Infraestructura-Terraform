@@ -40,7 +40,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "media_logs" {
 
     # Delete after 30 days
     expiration {
-      days = 30
+      days = 90
     }
 
     abort_incomplete_multipart_upload {
