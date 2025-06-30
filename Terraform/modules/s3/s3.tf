@@ -223,7 +223,8 @@ resource "aws_s3_bucket_replication_configuration" "logs_to_replica" {
       bucket        = aws_s3_bucket.frontend_replica.arn
       storage_class = "STANDARD"
       encryption_configuration {
-        replica_kms_key_id = aws_kms_key.replica.arn
+        replica_kms_key_id = var.kms_key_id
+        SseKmsEncryptedObjects = "Enabled"
       }
 
       replication_time {

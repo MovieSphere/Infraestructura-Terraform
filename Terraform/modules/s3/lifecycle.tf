@@ -35,12 +35,12 @@ resource "aws_s3_bucket_lifecycle_configuration" "frontend_logs" {
     }
 
     transition {
-      days          = 60
+      days          = 30
       storage_class = "STANDARD_IA"
     }
 
     # Borrar objetos de log tras 30 días
-    expiration { days = 30 }
+    expiration { days = 90 }
   }
 }
 
