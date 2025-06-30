@@ -178,3 +178,18 @@ variable "opensearch_id" {
     description = "ID del Security Group personalizado para OpenSearch"
     type        = string
 }
+
+variable "search_slow_log_group_arn" {
+  description = "ARN del CloudWatch Log Group para SEARCH_SLOW_LOGS"
+  type        = string
+}
+
+variable "index_slow_log_group_arn" {
+  description = "ARN del CloudWatch Log Group para INDEX_SLOW_LOGS"
+  type        = string
+}
+
+variable "audit_log_group_arn" {
+  description = "ARN del CloudWatch Log Group para AUDIT_LOGS"
+  type        = string
+}
