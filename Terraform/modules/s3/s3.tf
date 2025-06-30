@@ -234,16 +234,23 @@ resource "aws_s3_bucket_replication_configuration" "logs_to_replica" {
       encryption_configuration {
         replica_kms_key_id = var.kms_key_id  # KMS Key ARN
       }
+
+      # Bloque replication_time fuera de destination
       replication_time {
+        status  = "Enabled"
+        minutes = 15  # Sin el sub-bloque `time`
+      }
+
+      # Requerido por AWS si se usa replication_time
+      metrics {
         status = "Enabled"
-        time {
+        event_threshold {
           minutes = 15
         }
       }
     }
   }
 }
-
 
 resource "aws_s3_bucket_replication_configuration" "frontend" {
   bucket = aws_s3_bucket.frontend.id
