@@ -10,21 +10,27 @@ resource "aws_cloudfront_origin_access_control" "oac" {
   signing_protocol                  = "sigv4"
 }
 
-data "aws_iam_policy_document" "s3_oai" {
-  statement {
-    actions   = ["s3:GetObject"]
-    resources = ["${var.bucket_arn}/*"]
-
-    principals {
-      type        = "AWS"
-      identifiers = [aws_cloudfront_origin_access_identity.oai.iam_arn]
-    }
-  }
-}
+data "aws_caller_identity" "current" {}
 
 resource "aws_s3_bucket_policy" "frontend_policy" {
-  bucket = var.bucket_name
-  policy = data.aws_iam_policy_document.s3_oai.json
+  bucket = var.access_logs_bucket
+  policy =  jsonencode({
+    Version   = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AllowCloudFrontLogging"
+        Effect    = "Allow"
+        Principal = { Service = "cloudfront.amazonaws.com" }
+        Action    = ["s3:GetBucketAcl", "s3:PutBucketAcl", "s3:PutObject"]
+        Resource  = "${var.access_logs_bucket}/*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      }
+    ]
+  })
 }
 
 resource "aws_cloudfront_distribution" "cdn" {
@@ -311,4 +317,8 @@ resource "aws_cloudfront_distribution" "moviesphere" {
 
   # Asociar el Web ACL (opcional, se puede hacer después)
   web_acl_id = aws_wafv2_web_acl.log4j_protection.arn
+
+  depends_on = [
+    aws_cloudfront_distribution.cdn
+  ]
 }
