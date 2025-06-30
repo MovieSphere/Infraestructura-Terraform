@@ -15,18 +15,6 @@ variable "enable_access_logs" {
   default     = false
 }
 
-variable "access_logs_bucket" {
-  description = "Bucket S3 para logs de acceso de API Gateway"
-  type        = string
-  default     = ""
-}
-
-variable "access_logs_prefix" {
-  description = "Prefijo para logs de acceso de API Gateway"
-  type        = string
-  default     = ""
-}
-
 variable "kms_key_arn" {
   description = "ARN de la clave KMS para encriptar CloudWatch Log Group"
   type        = string
@@ -49,4 +37,10 @@ variable "client_cert_issuer" {
   description = "Emisor para el certificado de cliente JWT"
   type        = string
   default     = ""
+}
+
+variable "kms_key_id" {
+  description = "ARN de la clave KMS para encriptar los grupos de logs de API Gateway"
+  type        = string
+  default     = ""     # o quítalo si quieres hacerlo obligatorio
 }

@@ -1,26 +1,26 @@
 variable "project_name" {
-  description = "Nombre del proyecto"
+  description = "Nombre del proyecto para etiquetas y recursos"
   type        = string
 }
 
-variable "vpc_id" {
-  description = "VPC ID"
+variable "alb_sg_id" {
+  description = "ID del Security Group asociado al ALB"
   type        = string
 }
 
 variable "public_subnet_ids" {
-  description = "IDs de subredes públicas para el ALB"
+  description = "Lista de subnets públicas donde se desplegará el ALB"
   type        = list(string)
 }
 
-variable "instance_ids" {
-  description = "ID de la instancia EC2 que se registrará en el target group"
-  type = list(string)
+variable "vpc_id" {
+  description = "ID del VPC donde residen los recursos"
+  type        = string
 }
 
-variable "alb_sg_id" {
-  description = "ID del security group del ALB"
-  type        = string
+variable "instance_ids" {
+  description = "Lista de instancias EC2 que serán registradas en los target groups"
+  type        = list(string)
 }
 
 # Variables para configuración de HTTPS y certificados
@@ -30,7 +30,7 @@ variable "enable_https" {
   default     = false
 }
 
-variable "acm_certificate_arn" {
+variable "certificate_arn" {
   description = "ARN del certificado ACM para HTTPS"
   type        = string
   default     = ""
@@ -49,16 +49,8 @@ variable "alb_logs_bucket" {
   default     = ""
 }
 
-# Variables para WAF
-variable "alb_waf_arn" {
-  description = "ARN del WAF Web ACL para proteger el ALB"
-  type        = string
-  default     = ""
-}
-
-# Variable legacy para compatibilidad
-variable "acm_cert_arn" {
-  description = "Certificado ACM (legacy)"
+variable "web_acl_arn" {
+  description = "ARN del WAF Web ACL a asociar al ALB"
   type        = string
   default     = ""
 }

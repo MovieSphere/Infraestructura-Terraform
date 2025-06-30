@@ -7,3 +7,17 @@ output "flow_logs_role_arn" {
   description = "ARN del rol IAM para VPC Flow Logs"
   value       = aws_iam_role.flow_logs_role.arn
 }
+
+output "vpc_flow_logs_role_arn" {
+  value = aws_iam_role.vpc_flow_logs_role.arn
+}
+
+output "opensearch_access_policy_json" {
+  description = "JSON de la política de acceso para OpenSearch"
+  value       = data.aws_iam_policy_document.opensearch_access_policy.json
+}
+
+output "s3_replication_role_arn" {
+  description = "ARN del rol IAM para S3 replication"
+  value       = aws_iam_role.s3_replication_role.arn
+}

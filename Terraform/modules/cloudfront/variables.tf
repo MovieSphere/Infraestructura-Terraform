@@ -23,11 +23,9 @@ variable "cf_price_class" {
   type        = string
 }
 
-# Variables para WAF y seguridad
-variable "waf_web_acl_arn" {
-  description = "ARN del WAF Web ACL para CloudFront"
+variable "log_bucket_name" {
+  description = "Bucket donde se almacenan los logs de CloudFront"
   type        = string
-  default     = ""
 }
 
 variable "enable_access_logs" {
@@ -85,4 +83,16 @@ variable "minimum_protocol_version" {
     condition     = contains(["TLSv1", "TLSv1.1", "TLSv1.2_2019", "TLSv1.2_2021", "TLSv1.3"], var.minimum_protocol_version)
     error_message = "minimum_protocol_version debe ser una versión válida de TLS."
   }
+}
+
+variable "geo_restriction_locations" {
+  description = "Lista de códigos de pais permitidos en CloudFront"
+  type        = list(string)
+  default     = ["US","CA","MX","BR","AR","CL","CO","PE","VE","EC","BO","PY","UY","GY","SR","GF","FK"]
+}
+
+# Agrega esta nueva variable al final del archivo
+variable "waf_log_destination_arn" {
+  description = "ARN del destino de logs para WAF (S3, CloudWatch o Kinesis)"
+  type        = string
 }

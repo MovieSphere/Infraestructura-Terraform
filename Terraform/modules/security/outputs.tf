@@ -27,3 +27,7 @@ output "apigw_sg_id" {
   description = "ID del Security Group del APIGateway"
   value = aws_security_group.apigw_sg.id
 }
+
+output "alb_security_group_id" {
+  value = aws_security_group.alb_sg.id
+}

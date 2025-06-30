@@ -25,6 +25,10 @@ variable "auth_db_host" {
 variable "user_db_host" {
   description = "Url del DB de User"
 }
+
+variable "catalog_db_host" {
+  description = "Url del DB de Catalog"
+}
 variable "db_username" {
   description = "Username para ingresar a la BD"
 }
@@ -33,5 +37,10 @@ variable "db_password" {
 }
 variable "iam_instance_profile" {
   description = "Nombre del perfil de instancia IAM para CloudWatch"
+  type        = string
+}
+
+variable "opensearch_endpoint" {
+  description = "Endpoint del clúster OpenSearch"
   type        = string
 }

@@ -133,40 +133,41 @@ resource "aws_kms_key" "cw_logs" {
   deletion_window_in_days = 30
   enable_key_rotation     = true
 
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Id": "key-default-1",
-  "Statement": [
-    {
-      "Sid": "Allow administration of the key",
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Id      = "vpc-flow-logs-key-policy",
+    Statement = [
+      {
+        Sid    = "AllowRootAccount",
+        Effect = "Allow",
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        Action   = "kms:*",
+        Resource = "*"
       },
-      "Action": "kms:*",
-      "Resource": "*"
-    },
-    {
-      "Sid": "Allow CloudWatch Logs usage",
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "logs.${var.aws_region}.amazonaws.com"
-      },
-      "Action": [
-        "kms:GenerateDataKey*",
-        "kms:Decrypt"
-      ],
-      "Resource": "*",
-      "Condition": {
-        "StringEquals": {
-          "kms:EncryptionContext:aws:logs:arn": "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:*"
+      {
+        Sid    = "AllowCloudWatchLogsUse",
+        Effect = "Allow",
+        Principal = {
+          Service = "logs.${var.aws_region}.amazonaws.com"
+        },
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ],
+        Resource = "*",
+        Condition = {
+          ArnLike = {
+            "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:*"
+          }
         }
       }
-    }
-  ]
-}
-EOF
+    ]
+  })
 
   tags = {
     Name = "${var.project_name}-cw-logs-key"
@@ -184,15 +185,15 @@ resource "aws_cloudwatch_log_group" "vpc_logs" {
   }
 }
 
-# Desactiva todo tráfico en el Security Group por defecto
+# Desactiva to-do trafico en el Security Group por defecto
 resource "aws_default_security_group" "restrict_default" {
   vpc_id = aws_vpc.main.id
 
   # Reglas de entrada vacías
-  ingress = {}
+  ingress = []
 
   # Reglas de salida vacías
-  egress = {}
+  egress = []
 
   tags = {
     Name = "${var.project_name}-restricted-default-sg"

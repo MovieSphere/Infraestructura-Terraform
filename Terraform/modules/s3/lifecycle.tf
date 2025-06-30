@@ -1,18 +1,18 @@
-# File: modules/s3/lifecycle.tf
-
 resource "aws_s3_bucket_lifecycle_configuration" "frontend" {
   bucket = aws_s3_bucket.frontend.id
 
   rule {
-    id      = "expire-temp"
-    status  = "Enabled"
-    prefix  = "tmp/"
+    id     = "frontend-expire"
+    status = "Enabled"
 
-    expiration {
-      days = 7
+    filter {
+      prefix = "tmp/"
     }
 
-    # ✎ CKV_AWS_300: abort multipart uploads tras 7 días
+    expiration {
+      days = 365
+    }
+
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
@@ -20,39 +20,47 @@ resource "aws_s3_bucket_lifecycle_configuration" "frontend" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "frontend_logs" {
-  bucket = aws_s3_bucket.frontend_logs.id
+  bucket = aws_s3_bucket.frontend_logs.id   # ID del bucket de logs
 
   rule {
-    id      = "expire-logs"
-    status  = "Enabled"
-    prefix  = ""
+    id     = "expire-frontend-logs"
+    status = "Enabled"
 
-    expiration {
-      days = 30
-    }
+    # Filtro opcional: sustituye "" por "logs/" si usas un prefijo
+    filter { prefix = "" }
 
-    # ✎ CKV_AWS_300 para bucket de logs
+    # ❗ Abortar multipart uploads incompletos a los 7 días
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
+
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+
+    # Borrar objetos de log tras 30 días
+    expiration { days = 90 }
   }
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "frontend_replica" {
-  bucket = aws_s3_bucket.frontend_replica.id
+  bucket = aws_s3_bucket.frontend_replica.id   # ID del bucket réplica
 
   rule {
-    id      = "expire-replica"
-    status  = "Enabled"
-    prefix  = ""
+    id     = "frontend-replica-expire"
+    status = "Enabled"
 
-    expiration {
-      days = 30
-    }
+    # Sin prefijo; ajusta si usas carpetas virtuales
+    filter { prefix = "" }
 
-    # ✎ CKV_AWS_300 para bucket de réplica
+    # ❗ Abortar multipart uploads incompletos a los 7 días
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
+
+    # Borrar objetos de réplica tras 30 días
+    expiration { days = 90 }
   }
 }
+

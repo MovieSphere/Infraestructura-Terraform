@@ -12,4 +12,5 @@ variable "user_ip_cidr" {
 variable "vpc_cidr" {
   description = "CIDR block of the VPC"
   type        = string
+  default     = ""
 }

@@ -69,3 +69,92 @@ resource "aws_iam_role_policy" "flow_logs_policy" {
     }]
   })
 }
+
+resource "aws_iam_role" "vpc_flow_logs_role" {
+  name = "vpc-flow-logs-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "vpc-flow-logs.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "vpc_flow_logs_attach" {
+  role       = aws_iam_role.vpc_flow_logs_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+}
+
+data "aws_iam_policy_document" "opensearch_access_policy" {
+  statement {
+    effect    = "Allow"
+    actions   = ["es:*"]
+    resources = [
+      "arn:aws:es:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:domain/${var.project_name}/*"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+  }
+}
+
+# Rol para S3 Replication
+resource "aws_iam_role" "s3_replication_role" {
+  name = "${var.project_name}-s3-replication-role-${var.environment}"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "s3.amazonaws.com"
+      }
+    }]
+  })
+}
+
+# Política para S3 Replication
+resource "aws_iam_role_policy" "s3_replication_policy" {
+  name = "${var.project_name}-s3-replication-policy-${var.environment}"
+  role = aws_iam_role.s3_replication_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectVersion",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          var.frontend_bucket_arn,
+          "${var.frontend_bucket_arn}/*",
+          var.frontend_logs_bucket_arn,
+          "${var.frontend_logs_bucket_arn}/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ReplicateObject",
+          "s3:ReplicateDelete",
+          "s3:ReplicateTags"
+        ]
+        Resource = [
+          var.frontend_replica_bucket_arn,
+          "${var.frontend_replica_bucket_arn}/*"
+        ]
+      }
+    ]
+  })
+}

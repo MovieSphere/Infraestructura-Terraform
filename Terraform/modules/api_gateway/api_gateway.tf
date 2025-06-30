@@ -3,25 +3,10 @@ resource "aws_apigatewayv2_api" "http_api" {
   protocol_type = "HTTP"
 }
 
-resource "aws_apigatewayv2_authorizer" "client_cert" {
-  count = var.enable_client_cert_auth ? 1 : 0
-  
-  api_id           = aws_apigatewayv2_api.http_api.id
-  name             = "${var.project_name}-client-cert-authorizer"
-  authorizer_type  = "JWT"
-  identity_sources = ["$request.header.Authorization"]
-  
-  jwt_configuration {
-    audience = [var.client_cert_audience]
-    issuer   = var.client_cert_issuer
-  }
-}
-
-resource "aws_apigatewayv2_integration" "http_integration" {
-  api_id             = aws_apigatewayv2_api.http_api.id
-  integration_type   = "HTTP_PROXY"
-  integration_uri    = "https://${var.integration_uri}"
-  integration_method = "ANY"
+resource "aws_cloudwatch_log_group" "api_gw_access" {
+  name              = "/${var.project_name}/api-gw"
+  retention_in_days = 365      # Retiene logs al menos 1 año para cumplir CKV_AWS_338
+  kms_key_id        = var.kms_key_id != "" ? var.kms_key_id : null
 }
 
 resource "aws_apigatewayv2_stage" "default" {
@@ -47,6 +32,27 @@ resource "aws_apigatewayv2_stage" "default" {
       })
     }
   }
+}
+  
+resource "aws_apigatewayv2_authorizer" "client_cert" {
+  count = var.enable_client_cert_auth ? 1 : 0
+  
+  api_id           = aws_apigatewayv2_api.http_api.id
+  name             = "${var.project_name}-client-cert-authorizer"
+  authorizer_type  = "JWT"
+  identity_sources = ["$request.header.Authorization"]
+  
+  jwt_configuration {
+    audience = [var.client_cert_audience]
+    issuer   = var.client_cert_issuer
+  }
+}
+
+resource "aws_apigatewayv2_integration" "http_integration" {
+  api_id             = aws_apigatewayv2_api.http_api.id
+  integration_type   = "HTTP_PROXY"
+  integration_uri    = "https://${var.integration_uri}"
+  integration_method = "ANY"
 }
 
 resource "aws_cloudwatch_log_group" "api_gateway" {

@@ -69,6 +69,7 @@ runuser -l ubuntu -c "
   # Clonar repositorios
   git clone https://github.com/MovieSphere/ms_user_service.git
   git clone https://github.com/MovieSphere/ms_auth_service.git
+  git clone https://github.com/MovieSphere/ms_catalog_service.git
 
   git clone https://github.com/MovieSphere/ms_movie_service.git
   git clone https://github.com/MovieSphere/ms_actor_service.git
@@ -81,6 +82,7 @@ runuser -l ubuntu -c "
   cat <<EOT > .env
   MS_AUTH_DB_URL=${MS_AUTH_DB_URL}
   MS_USER_DB_URL=${MS_USER_DB_URL}
+  MS_CATALOG_DB_URL=${MS_CATALOG_DB_URL}
   DB_USERNAME=${DB_USERNAME}
   DB_PASSWORD=${DB_PASSWORD}
   OPENSEARCH_URL=${OPENSEARCH_URL}
@@ -101,6 +103,8 @@ services:
       DB_URL: \$\${MS_AUTH_DB_URL}
       DB_USERNAME: \$\${DB_USERNAME}
       DB_PASSWORD: \$\${DB_PASSWORD}
+    volumes:
+      - shared-logs:/app/logs
     depends_on: []
 
   ms_user_service:
@@ -113,6 +117,8 @@ services:
       DB_URL: \$\${MS_USER_DB_URL}
       DB_USERNAME: \$\${DB_USERNAME}
       DB_PASSWORD: \$\${DB_PASSWORD}
+    volumes:
+      - shared-logs:/app/logs
     depends_on: []
 
 
@@ -135,6 +141,18 @@ services:
       - '8094:8094'
     environment:
       # Variables por añadir
+    depends_on: []
+
+    ms_catalog_service:
+    build:
+      context: ./ms_catalog_service
+    container_name: ms_catalog_service
+    ports:
+      - '8093:8093'
+    environment:
+      DB_URL: \$\${MS_CATALOG_DB_URL}
+      DB_USERNAME: \$\${DB_USERNAME}
+      DB_PASSWORD: \$\${DB_PASSWORD}
     depends_on: []
 
   ms_rating_service:
@@ -166,8 +184,6 @@ services:
     environment:
       OPENSEARCH_URL: \$\${OPENSEARCH_URL}
     depends_on: []
-
-
 EOT
 
   # Levantar los microservicios

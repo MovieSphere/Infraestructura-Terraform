@@ -1,4 +1,3 @@
-
 resource "aws_wafv2_web_acl" "main" {
   name        = "${var.project_name}-web-acl"
   description = "WAF Web ACL para proteger recursos"
@@ -26,7 +25,7 @@ resource "aws_wafv2_web_acl" "main" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "AWSManagedRulesCommonRuleSetMetric"
+      metric_name                = "KnownBadInputsLog4j"
       sampled_requests_enabled   = true
     }
   }
@@ -303,7 +302,33 @@ resource "aws_wafv2_web_acl" "cloudfront" {
   scope       = "CLOUDFRONT"
 
   default_action {
-    allow {}
+    allow {
+
+    }
+  }
+
+  rule {
+    name     = "AWSManagedRulesAnonymousIpList"
+    priority = 0
+
+    override_action {
+      none {
+
+      }
+    }
+
+    statement {
+      managed_rule_group_statement {
+        vendor_name = "AWS"
+        name        = "AWSManagedRulesAnonymousIpList"
+      }
+    }
+
+    visibility_config {
+      sampled_requests_enabled   = true
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWSManagedRulesAnonymousIpListMetric"
+    }
   }
 
   # Regla para bloquear IPs maliciosas
@@ -312,7 +337,9 @@ resource "aws_wafv2_web_acl" "cloudfront" {
     priority = 1
 
     override_action {
-      none {}
+      none {
+
+      }
     }
 
     statement {
@@ -335,7 +362,9 @@ resource "aws_wafv2_web_acl" "cloudfront" {
     priority = 2
 
     override_action {
-      none {}
+      none {
+
+      }
     }
 
     statement {
