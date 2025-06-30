@@ -137,6 +137,7 @@ resource "aws_cloudfront_distribution" "cdn" {
 }
 
 resource "aws_wafv2_web_acl" "log4j_protection" {
+  provider    = aws.global
   name        = "log4j-protect-acl"
   description = "Proteccion contra vulnerabilidad Log4j CVE-2021-44228 con regla personalizada"
   scope       = "CLOUDFRONT"
