@@ -213,6 +213,8 @@ resource "aws_wafv2_web_acl" "log4j_protection" {
     metric_name                 = "log4j_protection"
     sampled_requests_enabled    = true
   }
+
+  depends_on = [aws_cloudfront_distribution.moviesphere]
 }
 
 resource "aws_cloudwatch_log_group" "waf_logs" {
@@ -246,4 +248,45 @@ resource "aws_wafv2_web_acl_logging_configuration" "waf_logging" {
 resource "aws_wafv2_web_acl_association" "cloudfront_waf" {
   web_acl_arn = aws_wafv2_web_acl.log4j_protection.arn
   resource_arn = aws_cloudfront_distribution.cdn.arn
+}
+
+resource "aws_cloudfront_distribution" "moviesphere" {
+  origin {
+    domain_name = "moviesphere-alb-73854958.us-east-1.elb.amazonaws.com"
+    origin_id   = "moviesphereALB"
+  }
+
+  enabled             = true
+  is_ipv6_enabled     = true
+  comment             = "Distribución para moviesphere"
+  default_root_object = "index.html"
+
+  default_cache_behavior {
+    target_origin_id = "moviesphereALB"
+    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+    cached_methods   = ["GET", "HEAD"]
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "none"
+      }
+    }
+    min_ttl     = 0
+    default_ttl = 86400
+    max_ttl     = 31536000
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
+  }
+
+  # Asociar el Web ACL (opcional, se puede hacer después)
+  web_acl_id = aws_wafv2_web_acl.log4j_protection.arn
 }
