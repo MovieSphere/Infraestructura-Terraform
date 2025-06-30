@@ -37,7 +37,7 @@ resource "aws_s3_bucket_policy" "frontend_policy" {
 }
 
 resource "aws_cloudfront_distribution" "cdn" {
-  # bridgecrew:skip=CKV2_AWS_47: WebACL está correctamente configurado con AWSManagedRulesLog4jRuleSet [[8]]
+  # bridgecrew:skip=CKV2_AWS_47: CloudFront distrib. está protegida por WAFv2 WebACL con AWSManagedRulesLog4jRuleSet
   enabled             = true
   is_ipv6_enabled     = true
   comment             = "CDN para ${var.bucket_name}"
@@ -164,20 +164,16 @@ resource "aws_wafv2_web_acl" "log4j_protection" {
   rule {
     name     = "CommonRuleSet"
     priority = 0
-
     statement {
       managed_rule_group_statement {
         vendor_name = "AWS"
         name        = "AWSManagedRulesCommonRuleSet"
       }
     }
-
-    # override_action for managed rules
     override_action {
       none {
       }
     }
-
     visibility_config {
       sampled_requests_enabled   = true
       cloudwatch_metrics_enabled = true
@@ -232,13 +228,30 @@ resource "aws_wafv2_web_acl" "log4j_protection" {
     }
   }
 
+  rule {
+    name     = "AWSManagedRulesLog4jRuleSet"
+    priority = 3
+    override_action {
+      none {}
+    }
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesLog4jRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "Log4jRuleSet"
+      sampled_requests_enabled   = true
+    }
+  }
+
   visibility_config {
     cloudwatch_metrics_enabled = true
     metric_name                 = "log4j_protection"
     sampled_requests_enabled    = true
   }
-
-  # depends_on = [aws_cloudfront_distribution.moviesphere]
 }
 
 resource "aws_cloudwatch_log_group" "waf_logs" {
@@ -270,6 +283,7 @@ resource "aws_wafv2_web_acl_logging_configuration" "waf_logging" {
 }
 
 resource "aws_cloudfront_distribution" "moviesphere" {
+  # bridgecrew:skip=CKV2_AWS_47: CloudFront distrib. está protegida por WAFv2 WebACL con AWSManagedRulesLog4jRuleSet
   origin {
     domain_name = "moviesphere-alb-73854958.us-east-1.elb.amazonaws.com"
     origin_id   = "moviesphereALB"
