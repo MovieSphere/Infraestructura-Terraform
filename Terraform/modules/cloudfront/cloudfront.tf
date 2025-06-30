@@ -191,10 +191,6 @@ resource "aws_wafv2_web_acl" "log4j_protection" {
       }
     }
     statement {
-      managed_rule_group_statement {
-        vendor_name = "AWS"
-        name        = "AWSManagedRulesKnownBadInputsRuleSet"
-      }
       byte_match_statement {
         search_string = "jndi:ldap"
         field_to_match {
