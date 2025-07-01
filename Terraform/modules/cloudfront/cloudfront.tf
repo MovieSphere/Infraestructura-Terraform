@@ -331,7 +331,7 @@ resource "aws_cloudfront_distribution" "moviesphere" {
   }
 
   # Asociar el Web ACL (opcional, se puede hacer después)
-  web_acl_id = aws_wafv2_web_acl.log4j_protection.arn
+  # web_acl_id = aws_wafv2_web_acl.log4j_protection.arn
 
   depends_on = [
     aws_cloudfront_distribution.cdn
