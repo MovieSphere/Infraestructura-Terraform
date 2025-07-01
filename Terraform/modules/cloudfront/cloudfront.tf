@@ -42,7 +42,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   is_ipv6_enabled     = true
   comment             = "CDN para ${var.bucket_name}"
   default_root_object = "index.html"
-  web_acl_id = aws_wafv2_web_acl.log4j_protection.arn
+  # web_acl_id = aws_wafv2_web_acl.log4j_protection.arn
 
   logging_config {
     bucket = var.log_bucket_name
