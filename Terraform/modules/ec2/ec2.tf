@@ -5,6 +5,7 @@ resource "aws_instance" "ec2_ubuntu_docker" {
   subnet_id                   = var.private_id
   vpc_security_group_ids      = [var.ec2_sg_id]
   key_name                    = var.key_name
+  associate_public_ip_address = false
   monitoring                  = true
   iam_instance_profile        = var.iam_instance_profile
   ebs_optimized               = true  
