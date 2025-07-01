@@ -96,3 +96,8 @@ variable "waf_log_destination_arn" {
   description = "ARN del destino de logs para WAF (S3, CloudWatch o Kinesis)"
   type        = string
 }
+
+variable "web_acl_arn" {
+  type        = string
+  description = "ARN del WAFv2 Web ACL (para asociar con CloudFront)"
+}

@@ -272,10 +272,10 @@ resource "aws_cloudwatch_log_resource_policy" "waf_logs_policy" {
 }
 
 # Configuración de logging para WAF (requerido por CKV2_AWS_31)
-resource "aws_wafv2_web_acl_logging_configuration" "waf_logging" {
-  log_destination_configs = [aws_cloudwatch_log_group.waf_logs.arn]
-  resource_arn            = aws_wafv2_web_acl.log4j_protection.arn
-}
+# resource "aws_wafv2_web_acl_logging_configuration" "waf_logging" {
+#   log_destination_configs = [aws_cloudwatch_log_group.waf_logs.arn]
+#   resource_arn            = aws_wafv2_web_acl.log4j_protection.arn
+# }
 
 resource "aws_cloudfront_distribution" "moviesphere" {
   # bridgecrew:skip=CKV2_AWS_47: CloudFront distrib. está protegida por WAFv2 WebACL con AWSManagedRulesLog4jRuleSet
@@ -332,6 +332,7 @@ resource "aws_cloudfront_distribution" "moviesphere" {
 
   # Asociar el Web ACL (opcional, se puede hacer después)
   # web_acl_id = aws_wafv2_web_acl.log4j_protection.arn
+  web_acl_id = var.web_acl_arn
 
   depends_on = [
     aws_cloudfront_distribution.cdn

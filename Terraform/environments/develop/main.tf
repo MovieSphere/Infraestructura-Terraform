@@ -156,6 +156,7 @@ module "cloudfront" {
   ssl_support_method  = "sni-only"
   minimum_protocol_version = "TLSv1.2_2021"
   enable_custom_ssl  = true
+  web_acl_arn         = module.waf.cloudfront_web_acl_arn
 }
 
 resource "aws_cloudwatch_log_group" "os_audit" {

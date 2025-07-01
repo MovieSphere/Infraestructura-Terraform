@@ -505,13 +505,12 @@ resource "aws_wafv2_web_acl" "cloudfront" {
 
 resource "aws_wafv2_web_acl_logging_configuration" "cloudfront" {
   count = var.enable_waf_logging ? 1 : 0
-  
-  log_destination_configs = [aws_kinesis_firehose_delivery_stream.waf_cloudfront_logs[0].arn]
+
   resource_arn            = aws_wafv2_web_acl.cloudfront.arn
+  log_destination_configs = [aws_kinesis_firehose_delivery_stream.waf_cloudfront_logs[0].arn]
 
   logging_filter {
     default_behavior = "KEEP"
-
     filter {
       behavior = "KEEP"
       condition {
