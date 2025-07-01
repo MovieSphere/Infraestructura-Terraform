@@ -24,10 +24,10 @@ resource "aws_lb" "app_alb" {
   }
 }
 
-# resource "aws_wafv2_web_acl_association" "alb_association" {
-#   resource_arn = aws_lb.app_alb.arn
-#   web_acl_arn  = var.web_acl_arn
-# }
+#  resource "aws_wafv2_web_acl_association" "alb_association" {
+#    resource_arn = aws_lb.app_alb.arn
+#    web_acl_arn  = var.web_acl_arn
+#  }
 
 resource "aws_lb_target_group" "tg_auth" {
   name     = "${var.project_name}-tg-auth"
