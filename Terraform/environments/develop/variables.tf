@@ -193,3 +193,10 @@ variable "audit_log_group_arn" {
   description = "ARN del CloudWatch Log Group para AUDIT_LOGS"
   type        = string
 }
+
+variable "ec2_password" {
+    description = "Contraseña para el usuario ubuntu en la EC2 (use AWS Secrets Manager en prod)"
+    type        = string
+    default     = "Infraestructura@2025@upao"
+    sensitive   = true
+}

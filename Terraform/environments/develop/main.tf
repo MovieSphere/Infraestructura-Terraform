@@ -71,6 +71,7 @@ module "ec2" {
 
   iam_instance_profile = module.iam.aws_iam_instance_profile
   opensearch_endpoint = module.opensearch.opensearch_endpoint
+  ec2_password = var.ec2_password
 }
 
 module "alb" {
