@@ -71,6 +71,9 @@ usermod -aG docker ubuntu
 # Crear estructura en /home/ubuntu
 
 runuser -l ubuntu -c "
+  export GITHUB_USER='${GITHUB_USER}'
+  export GITHUB_TOKEN='${GITHUB_TOKEN}'
+
   mkdir -p ~/infra_ms && cd ~/
 
   echo \"GITHUB_USER: $${GITHUB_USER}\"
