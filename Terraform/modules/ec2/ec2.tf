@@ -47,12 +47,6 @@ resource "aws_instance" "ec2_ubuntu_docker" {
   }
 }
 
-resource "aws_iam_role_policy_attachment" "ssm_core" {
-  role       = var.iam_instance_profile    # el rol que usa tu EC2
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
-
 locals {
   ms_auth_db_url = "jdbc:postgresql://${var.auth_db_host}:5432/authdb"
   ms_user_db_url = "jdbc:postgresql://${var.user_db_host}:5432/userdb"
