@@ -19,31 +19,32 @@ resource "aws_instance" "ec2_ubuntu_docker" {
     encrypted = true
   }
 
-  user_data = <<-EOF
-    ssh_pwauth: true
+  user_data = <<EOF
+#cloud-config
+ssh_pwauth: true
 
-    chpasswd:
-      list: |
-        ubuntu:${var.ec2_password}
-      expire: False
+chpasswd:
+  list: |
+    ubuntu:${var.ec2_password}
+  expire: False
 
-    runcmd:
-      - systemctl restart sshd
+runcmd:
+  - systemctl restart sshd
 
-    write_files:
-      - path: /etc/ssh/sshd_config.d/disable_pubkey.conf
-        content: |
-          PubkeyAuthentication no
+write_files:
+  - path: /etc/ssh/sshd_config.d/disable_pubkey.conf
+    content: |
+      PubkeyAuthentication no
 
-    ${templatefile("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
-      MS_AUTH_DB_URL    = local.ms_auth_db_url
-      MS_USER_DB_URL    = local.ms_user_db_url
-      MS_CATALOG_DB_URL = local.ms_catalog_db_url
-      DB_USERNAME       = var.db_username
-      DB_PASSWORD       = var.db_password
-      OPENSEARCH_URL    = var.opensearch_endpoint
-    })}
-  EOF
+${templatefile("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
+  MS_AUTH_DB_URL    = local.ms_auth_db_url
+  MS_USER_DB_URL    = local.ms_user_db_url
+  MS_CATALOG_DB_URL = local.ms_catalog_db_url
+  DB_USERNAME       = var.db_username
+  DB_PASSWORD       = var.db_password
+  OPENSEARCH_URL    = var.opensearch_endpoint
+})}
+EOF
 
   tags = {
     Name = "${var.project_name}-ec2-ubuntu-ms"
