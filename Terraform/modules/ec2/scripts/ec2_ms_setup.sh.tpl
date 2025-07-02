@@ -80,7 +80,11 @@ runuser -l ubuntu -c "
   git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_user_service.git
   git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_auth_service.git
   git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_catalog_service.git
-
+  git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_movie_service.git
+  git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_actor_service.git
+  git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_rating_service.git
+  git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_recomendation_service.git
+  git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_catalog_search_service.git
 
 
   # Crear archivo .env
@@ -105,9 +109,9 @@ services:
     ports:
       - '8091:8091'
     environment:
-      DB_URL: \$\${MS_AUTH_DB_URL}
-      DB_USERNAME: \$\${DB_USERNAME}
-      DB_PASSWORD: \$\${DB_PASSWORD}
+      DB_URL: \$\$${MS_AUTH_DB_URL}
+      DB_USERNAME: \$\$${DB_USERNAME}
+      DB_PASSWORD: \$\$${DB_PASSWORD}
     volumes:
       - shared-logs:/app/logs
     depends_on: []
@@ -119,9 +123,9 @@ services:
     ports:
       - '8092:8092'
     environment:
-      DB_URL: \$\${MS_USER_DB_URL}
-      DB_USERNAME: \$\${DB_USERNAME}
-      DB_PASSWORD: \$\${DB_PASSWORD}
+      DB_URL: \$\$${MS_USER_DB_URL}
+      DB_USERNAME: \$\$${DB_USERNAME}
+      DB_PASSWORD: \$\$${DB_PASSWORD}
     volumes:
       - shared-logs:/app/logs
     depends_on: []
@@ -154,8 +158,8 @@ services:
       - '8095:8095'
     environment:
       DB_URL: \$\${MS_CATALOG_DB_URL}
-      DB_USERNAME: \$\${DB_USERNAME}
-      DB_PASSWORD: \$\${DB_PASSWORD}
+      DB_USERNAME: \$\$${DB_USERNAME}
+      DB_PASSWORD: \$\$${DB_PASSWORD}
     depends_on: []
 
 #  ms_rating_service:
@@ -175,7 +179,7 @@ services:
     ports:
       - '8097:8097'
     environment:
-      OPENSEARCH_URL: \$\${OPENSEARCH_URL}
+      OPENSEARCH_URL: \$\$${OPENSEARCH_URL}
     depends_on: []
 
   ms_catalog_search_service:
@@ -185,7 +189,7 @@ services:
     ports:
       - '8098:8098'
     environment:
-      OPENSEARCH_URL: \$\${OPENSEARCH_URL}
+      OPENSEARCH_URL: \$\$${OPENSEARCH_URL}
     depends_on: []
 EOT
 
