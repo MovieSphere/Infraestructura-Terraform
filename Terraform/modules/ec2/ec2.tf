@@ -34,8 +34,7 @@ write_files:
     owner: ubuntu:ubuntu
     permissions: '0755'
     content: |
-      #!/bin/bash
-      ${templatefile("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
+      ${file("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
         MS_AUTH_DB_URL    = local.ms_auth_db_url
         MS_USER_DB_URL    = local.ms_user_db_url
         MS_CATALOG_DB_URL = local.ms_catalog_db_url
