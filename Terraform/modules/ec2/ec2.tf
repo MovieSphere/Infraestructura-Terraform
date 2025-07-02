@@ -20,7 +20,6 @@ resource "aws_instance" "ec2_ubuntu_docker" {
   }
 
   user_data = <<-EOF
-    # cloud-config
     ssh_pwauth: true
 
     chpasswd:
@@ -31,7 +30,11 @@ resource "aws_instance" "ec2_ubuntu_docker" {
     runcmd:
       - systemctl restart sshd
 
-    # Tu script original de microservicios
+    write_files:
+      - path: /etc/ssh/sshd_config.d/disable_pubkey.conf
+        content: |
+          PubkeyAuthentication no
+
     ${templatefile("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
       MS_AUTH_DB_URL    = local.ms_auth_db_url
       MS_USER_DB_URL    = local.ms_user_db_url
