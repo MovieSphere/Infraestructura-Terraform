@@ -189,3 +189,13 @@ resource "aws_security_group_rule" "apigw_egress_to_alb" {
   security_group_id              = aws_security_group.apigw_sg.id
   source_security_group_id      = aws_security_group.alb_sg.id
 }
+
+resource "aws_security_group_rule" "allow_ssh" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = ["34.193.55.66/32"]
+  security_group_id = aws_security_group.ec2_sg.id
+  description       = "Allow SSH from my public IP"
+}

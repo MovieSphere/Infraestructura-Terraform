@@ -33,15 +33,14 @@ write_files:
   - path: /home/ubuntu/ec2_ms_setup.sh
     owner: ubuntu:ubuntu
     permissions: '0755'
-    content: |
-      ${file("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
-        MS_AUTH_DB_URL    = local.ms_auth_db_url
-        MS_USER_DB_URL    = local.ms_user_db_url
-        MS_CATALOG_DB_URL = local.ms_catalog_db_url
-        DB_USERNAME       = var.db_username
-        DB_PASSWORD       = var.db_password
-        OPENSEARCH_URL    = var.opensearch_endpoint
-      })}
+    content = templatefile("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
+        MS_AUTH_DB_URL    = ${local.ms_auth_db_url}
+        MS_USER_DB_URL    = ${local.ms_user_db_url}
+        MS_CATALOG_DB_URL = ${local.ms_catalog_db_url}
+        DB_USERNAME       = ${var.db_username}
+        DB_PASSWORD       = ${var.db_password}
+        OPENSEARCH_URL    = ${var.opensearch_endpoint}
+      })
 runcmd:
   - systemctl restart sshd
   - /home/ubuntu/ec2_ms_setup.sh >> /var/log/ec2_ms_setup.log 2>&1
@@ -56,4 +55,8 @@ locals {
   ms_auth_db_url = "jdbc:postgresql://${var.auth_db_host}:5432/authdb"
   ms_user_db_url = "jdbc:postgresql://${var.user_db_host}:5432/userdb"
   ms_catalog_db_url = "jdbc:postgresql://${var.catalog_db_host}:5432/catalogdb"
+}
+
+resource "aws_eip" "ec2_public_ip" {
+
 }
