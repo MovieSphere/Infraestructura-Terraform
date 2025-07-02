@@ -70,7 +70,7 @@ module "ec2" {
   db_username = var.db_username
   db_password = var.db_password
 
-  iam_instance_profile = module.iam.aws_iam_instance_profile
+  iam_instance_profile = module.iam.cloudwatch_agent_profile_name
   opensearch_endpoint = module.opensearch.opensearch_endpoint
   ec2_password = var.ec2_password
 }

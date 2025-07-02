@@ -21,3 +21,12 @@ output "s3_replication_role_arn" {
   description = "ARN del rol IAM para S3 replication"
   value       = aws_iam_role.s3_replication_role.arn
 }
+
+output "cloudwatch_agent_role_name" {
+  description = "Nombre del IAM Role que usa el CloudWatch Agent y SSM"
+  value       = aws_iam_role.cloudwatch_agent.name
+}
+
+output "cloudwatch_agent_profile_name" {
+  value = aws_iam_instance_profile.cloudwatch_profile.name
+}

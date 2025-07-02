@@ -28,6 +28,11 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_agent" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
+resource "aws_iam_role_policy_attachment" "ssm_core" {
+  role       = aws_iam_role.cloudwatch_agent.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 # Perfil de instancia EC2 para CloudWatch Agent
 resource "aws_iam_instance_profile" "cloudwatch_profile" {
   name = "${var.project_name}-cloudwatch-profile"
