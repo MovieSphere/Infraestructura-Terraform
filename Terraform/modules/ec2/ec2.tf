@@ -22,30 +22,27 @@ resource "aws_instance" "ec2_ubuntu_docker" {
   }
 
   user_data = <<EOF
-#cloud-config
-chpasswd:
-  list: |
-    ubuntu:${var.ec2_password}
-  expire: False
-write_files:
-  - path: /etc/ssh/sshd_config.d/disable_pubkey.conf
-    content: |
-      PubkeyAuthentication yes
-  - path: /home/ubuntu/ec2_ms_setup.sh
-    owner: ubuntu:ubuntu
-    permissions: '0755'
-    content: |
-      ${templatefile("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
-        MS_AUTH_DB_URL = local.ms_auth_db_url
-        MS_USER_DB_URL = local.ms_user_db_url
-        MS_CATALOG_DB_URL = local.ms_catalog_db_url
-        DB_USERNAME = var.db_username
-        DB_PASSWORD = var.db_password
-        OPENSEARCH_URL = var.opensearch_endpoint
-      })}
-runcmd:
-  - systemctl restart sshd
-  - /home/ubuntu/ec2_ms_setup.sh >> /var/log/ec2_ms_setup.log 2>&1
+#!/bin/bash
+chpasswd -e <<< 'ubuntu:${var.ec2_password}'
+echo "PubkeyAuthentication yes" > /etc/ssh/sshd_config.d/disable_pubkey.conf
+systemctl restart sshd
+
+# Crear el script
+cat > /home/ubuntu/ec2_ms_setup.sh << 'SCRIPT_EOF'
+${templatefile("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
+  MS_AUTH_DB_URL = local.ms_auth_db_url
+  MS_USER_DB_URL = local.ms_user_db_url
+  MS_CATALOG_DB_URL = local.ms_catalog_db_url
+  DB_USERNAME = var.db_username
+  DB_PASSWORD = var.db_password
+  OPENSEARCH_URL = var.opensearch_endpoint
+})}
+SCRIPT_EOF
+
+chown ubuntu:ubuntu /home/ubuntu/ec2_ms_setup.sh
+chmod 755 /home/ubuntu/ec2_ms_setup.sh
+
+/home/ubuntu/ec2_ms_setup.sh >> /var/log/ec2_ms_setup.log 2>&1
 EOF
 
   tags = {
