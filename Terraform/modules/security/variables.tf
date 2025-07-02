@@ -14,3 +14,8 @@ variable "vpc_cidr" {
   type        = string
   default     = ""
 }
+
+variable "ssh_cidr" {
+  description = "Rango CIDR desde el que permitimos SSH"
+  type        = string
+}

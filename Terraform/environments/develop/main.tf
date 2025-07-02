@@ -16,6 +16,7 @@ module "security" {
   vpc_id       = module.vpc.vpc_id
   user_ip_cidr = var.user_ip_cidr
   vpc_cidr     = var.vpc_cidr
+  ssh_cidr     = "3.219.142.200/32"
 }
 
 module "cloudwatch" {
