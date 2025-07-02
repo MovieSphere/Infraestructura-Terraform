@@ -73,28 +73,28 @@ usermod -aG docker ubuntu
 runuser -l ubuntu -c "
   mkdir -p ~/infra_ms && cd ~/
 
-  echo \"GITHUB_USER: ${GITHUB_USER}\"
-  echo \"GITHUB_TOKEN: ${GITHUB_TOKEN:0:4}****\"
+  echo \"GITHUB_USER: $${GITHUB_USER}\"
+  echo \"GITHUB_TOKEN: $${GITHUB_TOKEN:0:4}****\"
 
   # Clonar repositorios
-  git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_user_service.git
-  git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_auth_service.git
-  git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_catalog_service.git
-  git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_movie_service.git
-  git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_actor_service.git
-  git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_rating_service.git
-  git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_recomendation_service.git
-  git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_catalog_search_service.git
+  git clone https://$${GITHUB_USER}:$${GITHUB_TOKEN}@github.com/MovieSphere/ms_user_service.git
+  git clone https://$${GITHUB_USER}:$${GITHUB_TOKEN}@github.com/MovieSphere/ms_auth_service.git
+  git clone https://$${GITHUB_USER}:$${GITHUB_TOKEN}@github.com/MovieSphere/ms_catalog_service.git
+  git clone https://$${GITHUB_USER}:$${GITHUB_TOKEN}@github.com/MovieSphere/ms_movie_service.git
+  git clone https://$${GITHUB_USER}:$${GITHUB_TOKEN}@github.com/MovieSphere/ms_actor_service.git
+  git clone https://$${GITHUB_USER}:$${GITHUB_TOKEN}@github.com/MovieSphere/ms_rating_service.git
+  git clone https://$${GITHUB_USER}:$${GITHUB_TOKEN}@github.com/MovieSphere/ms_recomendation_service.git
+  git clone https://$${GITHUB_USER}:$${GITHUB_TOKEN}@github.com/MovieSphere/ms_catalog_search_service.git
 
 
   # Crear archivo .env
   cat <<EOT > .env
-  MS_AUTH_DB_URL=${MS_AUTH_DB_URL}
-  MS_USER_DB_URL=${MS_USER_DB_URL}
-  MS_CATALOG_DB_URL=${MS_CATALOG_DB_URL}
-  DB_USERNAME=${DB_USERNAME}
-  DB_PASSWORD=${DB_PASSWORD}
-  OPENSEARCH_URL=${OPENSEARCH_URL}
+  MS_AUTH_DB_URL=$${MS_AUTH_DB_URL}
+  MS_USER_DB_URL=$${MS_USER_DB_URL}
+  MS_CATALOG_DB_URL=$${MS_CATALOG_DB_URL}
+  DB_USERNAME=$${DB_USERNAME}
+  DB_PASSWORD=$${DB_PASSWORD}
+  OPENSEARCH_URL=$${OPENSEARCH_URL}
   EOT
 
 
@@ -109,9 +109,9 @@ runuser -l ubuntu -c "
       ports:
         - '8091:8091'
       environment:
-        DB_URL: $$$${MS_AUTH_DB_URL}
-        DB_USERNAME: $$$${DB_USERNAME}
-        DB_PASSWORD: $$$${DB_PASSWORD}
+        DB_URL: $${MS_AUTH_DB_URL}
+        DB_USERNAME: $${DB_USERNAME}
+        DB_PASSWORD: $${DB_PASSWORD}
       volumes:
         - shared-logs:/app/logs
       depends_on: []
@@ -123,9 +123,9 @@ runuser -l ubuntu -c "
       ports:
         - '8092:8092'
       environment:
-        DB_URL: $$$${MS_USER_DB_URL}
-        DB_USERNAME: $$$${DB_USERNAME}
-        DB_PASSWORD: $$$${DB_PASSWORD}
+        DB_URL: $${MS_USER_DB_URL}
+        DB_USERNAME: $${DB_USERNAME}
+        DB_PASSWORD: $${DB_PASSWORD}
       volumes:
         - shared-logs:/app/logs
       depends_on: []
@@ -137,9 +137,9 @@ runuser -l ubuntu -c "
       ports:
         - '8095:8095'
       environment:
-        DB_URL: $$$${MS_CATALOG_DB_URL}
-        DB_USERNAME: $$$${DB_USERNAME}
-        DB_PASSWORD: $$$${DB_PASSWORD}
+        DB_URL: $${MS_CATALOG_DB_URL}
+        DB_USERNAME: $${DB_USERNAME}
+        DB_PASSWORD: $${DB_PASSWORD}
       depends_on: []
 
     ms_recomendation_service:
@@ -149,7 +149,7 @@ runuser -l ubuntu -c "
       ports:
         - '8097:8097'
       environment:
-        OPENSEARCH_URL: $$$${OPENSEARCH_URL}
+        OPENSEARCH_URL: $${OPENSEARCH_URL}
       depends_on: []
 
     ms_catalog_search_service:
@@ -159,7 +159,7 @@ runuser -l ubuntu -c "
       ports:
         - '8098:8098'
       environment:
-        OPENSEARCH_URL: $$$${OPENSEARCH_URL}
+        OPENSEARCH_URL: $${OPENSEARCH_URL}
       depends_on: []
   EOT
 
