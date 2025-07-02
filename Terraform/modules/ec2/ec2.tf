@@ -30,20 +30,21 @@ chpasswd:
 
 runcmd:
   - systemctl restart sshd
-
-write_files:
-  - path: /etc/ssh/sshd_config.d/disable_pubkey.conf
-    content: |
-      PubkeyAuthentication no
-
-${templatefile("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
+  - |
+${indent(4, templatefile("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
   MS_AUTH_DB_URL    = local.ms_auth_db_url
   MS_USER_DB_URL    = local.ms_user_db_url
   MS_CATALOG_DB_URL = local.ms_catalog_db_url
   DB_USERNAME       = var.db_username
   DB_PASSWORD       = var.db_password
   OPENSEARCH_URL    = var.opensearch_endpoint
-})}
+}))}
+
+write_files:
+  - path: /etc/ssh/sshd_config.d/disable_pubkey.conf
+    content: |
+      PubkeyAuthentication no
+
 EOF
 
   tags = {
