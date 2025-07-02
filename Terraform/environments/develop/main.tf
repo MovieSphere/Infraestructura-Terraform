@@ -7,6 +7,7 @@ module "vpc" {
   availability_zones   = var.availability_zones
   flow_logs_role_arn   = module.iam.vpc_flow_logs_role_arn
   aws_region           = var.region
+  ec2_sg_id            = module.security.ec2_sg_id
 }
 
 module "security" {

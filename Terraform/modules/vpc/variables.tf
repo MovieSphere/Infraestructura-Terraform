@@ -30,3 +30,8 @@ variable "aws_region" {
   description = "AWS region where resources are deployed"
   type        = string
 }
+
+variable "ec2_sg_id" {
+  description = "ID del Security Group de EC2 (para endpoints de VPC)"
+  type        = string
+}

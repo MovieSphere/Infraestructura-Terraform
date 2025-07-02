@@ -199,3 +199,30 @@ resource "aws_default_security_group" "restrict_default" {
     Name = "${var.project_name}-restricted-default-sg"
   }
 }
+
+# Interface Endpoint para SSM
+resource "aws_vpc_endpoint" "ssm" {
+  vpc_endpoint_type = "Interface"
+  service_name      = "com.amazonaws.${var.aws_region}.ssm"
+  vpc_id            = aws_vpc.main.id
+  subnet_ids        = aws_subnet.private[*].id
+  security_group_ids = [var.ec2_sg_id]
+}
+
+# Interface Endpoint para SSMMessages
+resource "aws_vpc_endpoint" "ssmmessages" {
+  vpc_endpoint_type = "Interface"
+  service_name      = "com.amazonaws.${var.aws_region}.ssmmessages"
+  vpc_id            = aws_vpc.main.id
+  subnet_ids        = aws_subnet.private[*].id
+  security_group_ids = [var.ec2_sg_id]
+}
+
+# Interface Endpoint para EC2Messages
+resource "aws_vpc_endpoint" "ec2messages" {
+  vpc_endpoint_type = "Interface"
+  service_name      = "com.amazonaws.${var.aws_region}.ec2messages"
+  vpc_id            = aws_vpc.main.id
+  subnet_ids        = aws_subnet.private[*].id
+  security_group_ids = [var.ec2_sg_id]
+}
