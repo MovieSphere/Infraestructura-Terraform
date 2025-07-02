@@ -33,3 +33,19 @@ output "alb_sg_id" {
 output "alb_security_group_id" {
   value = module.security.alb_security_group_id
 }
+
+output "MS_AUTH_DB_URL" {
+  value = module.rds.auth_db_address
+}
+
+output "MS_USERS_DB_URL" {
+  value = module.rds.users_db_address
+}
+
+output "MS_CATALOG_DB_URL" {
+  value = module.rds.catalog_db_address
+}
+
+output "opensearch_endpoint" {
+  value = module.opensearch.opensearch_endpoint
+}
