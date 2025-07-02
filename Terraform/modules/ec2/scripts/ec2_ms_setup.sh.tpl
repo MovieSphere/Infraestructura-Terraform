@@ -4,7 +4,10 @@
 # Actualizar e instalar herramientas necesarias y la instalación de amazon cloudwatch agent
 
 apt-get update
-apt-get install -y ca-certificates curl gnupg lsb-release git amazon-cloudwatch-agent
+apt-get install -y ca-certificates curl gnupg lsb-release git
+
+wget https://amazoncloudwatch-agent.s3.amazonaws.com/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
 
 # Instalar Docker
 
@@ -94,7 +97,7 @@ runuser -l ubuntu -c "
 
   # Crear archivo docker-compose.yml
   cat <<EOT > docker-compose.yml
-version: '3.8'
+name: 'movie_preferences'
 services:
   ms_auth_service:
     build:
