@@ -73,8 +73,8 @@ usermod -aG docker ubuntu
 runuser -l ubuntu -c "
   mkdir -p ~/infra_ms && cd ~/
 
-  echo "GITHUB_USER: ${GITHUB_USER}"
-  echo "GITHUB_TOKEN: ${GITHUB_TOKEN:0:4}****"
+  echo \"GITHUB_USER: ${GITHUB_USER}\"
+  echo \"GITHUB_TOKEN: ${GITHUB_TOKEN:0:4}****\"
 
   # Clonar repositorios
   git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_user_service.git
