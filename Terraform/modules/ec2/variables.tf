@@ -50,3 +50,14 @@ variable "ec2_password" {
   type        = string
   sensitive   = true
 }
+
+variable "github_user" {
+  description = "Usuario de GitHub para clonar repositorios"
+  type        = string
+}
+
+variable "github_token" {
+  description = "Token de GitHub para autenticación"
+  type        = string
+  sensitive   = true
+}

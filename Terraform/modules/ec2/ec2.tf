@@ -36,6 +36,8 @@ ${templatefile("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
   DB_USERNAME = var.db_username
   DB_PASSWORD = var.db_password
   OPENSEARCH_URL = var.opensearch_endpoint
+  GITHUB_USER = var.github_user
+  GITHUB_TOKEN = var.github_token
 })}
 SCRIPT_EOF
 

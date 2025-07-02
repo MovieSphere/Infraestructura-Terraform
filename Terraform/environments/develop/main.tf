@@ -74,6 +74,9 @@ module "ec2" {
   iam_instance_profile = module.iam.cloudwatch_agent_profile_name
   opensearch_endpoint = module.opensearch.opensearch_endpoint
   ec2_password = var.ec2_password
+
+  github_user = var.github_user
+  github_token = var.github_token
 }
 
 module "alb" {

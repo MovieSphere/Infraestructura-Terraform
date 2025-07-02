@@ -71,17 +71,16 @@ usermod -aG docker ubuntu
 # Crear estructura en /home/ubuntu
 
 runuser -l ubuntu -c "
-  mkdir -p ~/infra_ms && cd ~/infra_ms
+  mkdir -p ~/infra_ms && cd ~/
+
+  echo "GITHUB_USER: ${GITHUB_USER}"
+  echo "GITHUB_TOKEN: ${GITHUB_TOKEN:0:4}****"
 
   # Clonar repositorios
-  git clone https://github.com/MovieSphere/ms_user_service.git
-  git clone https://github.com/MovieSphere/ms_auth_service.git
-  git clone https://github.com/MovieSphere/ms_catalog_service.git
-  git clone https://github.com/MovieSphere/ms_movie_service.git
-  git clone https://github.com/MovieSphere/ms_actor_service.git
-  git clone https://github.com/MovieSphere/ms_rating_service.git
-  git clone https://github.com/MovieSphere/ms_recomendation_service.git
-  git clone https://github.com/MovieSphere/ms_catalog_search_service.git
+  git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_user_service.git
+  git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_auth_service.git
+  git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/MovieSphere/ms_catalog_service.git
+
 
 
   # Crear archivo .env
