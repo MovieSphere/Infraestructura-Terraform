@@ -13,6 +13,8 @@ resource "aws_instance" "ec2_ubuntu_docker" {
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
+    http_put_response_hop_limit = 2
+    instance_metadata_tags      = "enabled"
   }
 
   root_block_device {
@@ -21,7 +23,6 @@ resource "aws_instance" "ec2_ubuntu_docker" {
 
   user_data = <<EOF
 #cloud-config
-ssh_pwauth: true
 chpasswd:
   list: |
     ubuntu:${var.ec2_password}
@@ -29,18 +30,19 @@ chpasswd:
 write_files:
   - path: /etc/ssh/sshd_config.d/disable_pubkey.conf
     content: |
-      PubkeyAuthentication no
+      PubkeyAuthentication yes
   - path: /home/ubuntu/ec2_ms_setup.sh
     owner: ubuntu:ubuntu
     permissions: '0755'
-    content = templatefile("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
-        MS_AUTH_DB_URL    = ${local.ms_auth_db_url}
-        MS_USER_DB_URL    = ${local.ms_user_db_url}
-        MS_CATALOG_DB_URL = ${local.ms_catalog_db_url}
-        DB_USERNAME       = ${var.db_username}
-        DB_PASSWORD       = ${var.db_password}
-        OPENSEARCH_URL    = ${var.opensearch_endpoint}
-      })
+    content: |
+      ${templatefile("${path.module}/scripts/ec2_ms_setup.sh.tpl", {
+        MS_AUTH_DB_URL = local.ms_auth_db_url
+        MS_USER_DB_URL = local.ms_user_db_url
+        MS_CATALOG_DB_URL = local.ms_catalog_db_url
+        DB_USERNAME = var.db_username
+        DB_PASSWORD = var.db_password
+        OPENSEARCH_URL = var.opensearch_endpoint
+      })}
 runcmd:
   - systemctl restart sshd
   - /home/ubuntu/ec2_ms_setup.sh >> /var/log/ec2_ms_setup.log 2>&1
@@ -58,5 +60,9 @@ locals {
 }
 
 resource "aws_eip" "ec2_public_ip" {
+  instance = aws_instance.ec2_ubuntu_docker.id
 
+  tags = {
+    Name = "${var.project_name}-ec2-eip"
+  }
 }
