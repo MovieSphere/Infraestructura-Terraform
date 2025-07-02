@@ -2,10 +2,12 @@
 
 # Instalación de Docker Engine por medio del repositorio APT para Ubuntu
 # Actualizar e instalar herramientas necesarias y la instalación de amazon cloudwatch agent
+
 apt-get update
 apt-get install -y ca-certificates curl gnupg lsb-release git amazon-cloudwatch-agent
 
 # Instalar Docker
+
 install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 chmod a+r /etc/apt/keyrings/docker.asc
@@ -60,9 +62,11 @@ apt-get update
 apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # Agregar usuario ubuntu al grupo docker
+
 usermod -aG docker ubuntu
 
 # Crear estructura en /home/ubuntu
+
 runuser -l ubuntu -c "
   mkdir -p ~/infra_ms && cd ~/infra_ms
 
