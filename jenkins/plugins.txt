@@ -1,0 +1,61 @@
+# Jenkins Plugins para Pipeline de Terraform
+
+# Core Plugins
+workflow-aggregator:latest
+pipeline-stage-view:latest
+blueocean:latest
+
+# Git Integration
+git:latest
+git-client:latest
+
+# AWS Integration
+aws-credentials:latest
+aws-java-sdk:latest
+
+# Terraform Integration
+terraform:latest
+
+# Security Scanning
+sonar:latest
+
+# Testing and Reporting
+junit:latest
+test-results-analyzer:latest
+
+# Credentials Management
+credentials-binding:latest
+ssh-credentials:latest
+plain-credentials:latest
+
+# Docker Integration
+docker-plugin:latest
+docker-workflow:latest
+
+# Pipeline Utilities
+pipeline-utility-steps:latest
+pipeline-build-step:latest
+pipeline-input-step:latest
+
+# Build Management
+timestamper:latest
+build-timeout:latest
+parameterized-trigger:latest
+
+# Conditional Builds
+conditional-buildstep:latest
+extended-choice-parameter:latest
+
+# Environment Management
+envinject:latest
+
+# Monitoring and Logging
+monitoring:latest
+
+# UI Enhancements
+simple-theme-plugin:latest
+dark-theme:latest
+
+# Additional Utilities
+rebuild:latest
+copyartifact:latest 

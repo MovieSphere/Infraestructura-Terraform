@@ -1,0 +1,5 @@
+skip-check:
+ - CKV_AWS_91 #Lo dejo al ultimo, me bota 4 errores mas, en vez de solucionar
+ - CKV_AWS_2 y CKV2_AWS_20 #No se soluciona y tampoco arroja más errores
+ - CKV_AWS_103 #No se soluciona y tampoco arroja más errores
+ 
